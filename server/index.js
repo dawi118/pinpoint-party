@@ -44,11 +44,16 @@ io.on("connection", (socket) => {
     reply?.(games.get(roomCode) ?? null);
   });
 
-  socket.on("game:save", (game) => {
-    if (!game?.roomCode) return;
+  socket.on("game:save", (game, reply) => {
+    if (!game?.roomCode) {
+      reply?.({ ok: false });
+      return;
+    }
+
     games.set(game.roomCode, game);
     socket.join(game.roomCode);
     io.to(game.roomCode).emit("game:update", game);
+    reply?.({ ok: true, roomCode: game.roomCode });
   });
 });
 

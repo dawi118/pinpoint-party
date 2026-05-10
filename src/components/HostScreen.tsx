@@ -12,7 +12,7 @@ import {
   startRound,
   updateSettings
 } from "../lib/gameState";
-import { fetchGame, loadGame, saveGame, subscribeToGame } from "../lib/localGameStore";
+import { fetchGame, loadGame, saveGame, saveGameAndWait, subscribeToGame } from "../lib/localGameStore";
 import { generateRoomCode } from "../lib/roomCodes";
 import { GameState } from "../lib/types";
 import { RevealMap } from "./RevealMap";
@@ -86,10 +86,10 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
           </div>
           <form
             className="setup-panel"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
               const next = createInitialGame({ roomCode: generateRoomCode(), roundCount, timerSeconds });
-              saveGame(next);
+              await saveGameAndWait(next);
               window.location.href = `/host/${next.roomCode}`;
             }}
           >

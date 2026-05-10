@@ -64,6 +64,8 @@ http://192.168.1.191:4173/
 
 Players should scan or open the join URL with that same laptop IP address. `localhost` only means "this device", so a phone visiting `localhost` will look at the phone itself, not the laptop. The LAN server keeps room state in memory with Socket.IO, so phones and the host share the same lobby, guesses, reveal, and scoreboard.
 
+Create the host room from the LAN URL too, not the Vite dev URL, when playing with phones. If the laptop is using `http://localhost:5173/`, phones will reach the login screen but will not see the same server-backed room.
+
 ## Project Structure
 
 ```text

@@ -28,7 +28,7 @@ export async function fetchGame(roomCode: string): Promise<GameState | undefined
 
   if (!activeSocket) return local;
 
-  const remote = await activeSocket.timeout(1200).emitWithAck("game:load", roomCode).catch(() => undefined);
+  const remote = await activeSocket.timeout(3000).emitWithAck("game:load", roomCode).catch(() => undefined);
   if (!remote) {
     if (local) activeSocket.emit("game:save", local);
     return local;
@@ -47,6 +47,19 @@ export function saveGame(game: GameState) {
     channel.postMessage(game);
     channel.close();
   }
+}
+
+export async function saveGameAndWait(game: GameState): Promise<boolean> {
+  cacheGame(game);
+
+  const activeSocket = getSocket();
+  if (!activeSocket) return false;
+
+  const connected = await waitForSocket(activeSocket, 3000);
+  if (!connected) return false;
+
+  const result = await activeSocket.timeout(3000).emitWithAck("game:save", game).catch(() => undefined);
+  return Boolean((result as { ok?: boolean } | undefined)?.ok);
 }
 
 export function subscribeToGame(roomCode: string, onChange: (game: GameState) => void) {
@@ -95,4 +108,34 @@ function getSocket() {
   });
 
   return socket;
+}
+
+function waitForSocket(activeSocket: Socket, timeoutMs: number): Promise<boolean> {
+  if (activeSocket.connected) return Promise.resolve(true);
+
+  return new Promise((resolve) => {
+    const timeout = window.setTimeout(() => {
+      cleanup();
+      resolve(false);
+    }, timeoutMs);
+
+    const handleConnect = () => {
+      cleanup();
+      resolve(true);
+    };
+
+    const handleError = () => {
+      cleanup();
+      resolve(false);
+    };
+
+    const cleanup = () => {
+      window.clearTimeout(timeout);
+      activeSocket.off("connect", handleConnect);
+      activeSocket.off("connect_error", handleError);
+    };
+
+    activeSocket.once("connect", handleConnect);
+    activeSocket.once("connect_error", handleError);
+  });
 }
