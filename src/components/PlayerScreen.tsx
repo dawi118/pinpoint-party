@@ -2,7 +2,7 @@ import { Check, Clock, Trophy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { confirmGuess, getRoundGuesses, upsertGuess } from "../lib/gameState";
 import { formatDistance } from "../lib/geo";
-import { loadGame, saveGame, subscribeToGame } from "../lib/localGameStore";
+import { fetchGame, loadGame, saveGame, subscribeToGame } from "../lib/localGameStore";
 import { GameState, Guess } from "../lib/types";
 import { Scoreboard } from "./Scoreboard";
 import { WorldGuessMap } from "./WorldGuessMap";
@@ -12,6 +12,12 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => subscribeToGame(roomCode, setGame), [roomCode]);
+  useEffect(() => {
+    if (game) return;
+    void fetchGame(roomCode).then((remoteGame) => {
+      if (remoteGame) setGame(remoteGame);
+    });
+  }, [game, roomCode]);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 500);
     return () => window.clearInterval(timer);
@@ -89,7 +95,14 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
             <p>Round {game.currentRoundIndex + 1} is queued. Keep this screen open.</p>
           </>
         )}
-        {(game.status === "revealing" || game.status === "scoreboard") && (
+        {game.status === "revealing" && (
+          <>
+            <span className="kicker">Reveal in progress</span>
+            <h1>Eyes on the main screen</h1>
+            <p>Scores unlock after the final answer reveal.</p>
+          </>
+        )}
+        {game.status === "scoreboard" && (
           <PlayerResult guess={ownGuess} locationLabel={round.locationLabel} />
         )}
         {game.status === "finished" && (

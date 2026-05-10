@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { addPlayer, getAvailableColors } from "../lib/gameState";
-import { loadGame, saveGame } from "../lib/localGameStore";
+import { fetchGame, saveGame } from "../lib/localGameStore";
 import { normalizeRoomCode } from "../lib/roomCodes";
 
 export function JoinScreen({ initialRoomCode }: { initialRoomCode?: string }) {
@@ -10,10 +10,10 @@ export function JoinScreen({ initialRoomCode }: { initialRoomCode?: string }) {
   const [color, setColor] = useState(getAvailableColors()[0]);
   const [error, setError] = useState("");
 
-  const joinGame = (event: FormEvent) => {
+  const joinGame = async (event: FormEvent) => {
     event.preventDefault();
     const code = normalizeRoomCode(roomCode);
-    const game = loadGame(code);
+    const game = await fetchGame(code);
 
     if (!game) {
       setError("Room not found on this prototype device. Open the host room in another tab first.");

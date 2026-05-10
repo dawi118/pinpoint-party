@@ -8,10 +8,11 @@ import {
   finishRound,
   getRoundGuesses,
   showScoreboard,
+  sortGuessesForReveal,
   startRound,
   updateSettings
 } from "../lib/gameState";
-import { loadGame, saveGame, subscribeToGame } from "../lib/localGameStore";
+import { fetchGame, loadGame, saveGame, subscribeToGame } from "../lib/localGameStore";
 import { generateRoomCode } from "../lib/roomCodes";
 import { GameState } from "../lib/types";
 import { RevealMap } from "./RevealMap";
@@ -29,6 +30,13 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
   }, [roomCode]);
 
   useEffect(() => {
+    if (!roomCode || game) return;
+    void fetchGame(roomCode).then((remoteGame) => {
+      if (remoteGame) setGame(remoteGame);
+    });
+  }, [game, roomCode]);
+
+  useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 500);
     return () => window.clearInterval(timer);
   }, []);
@@ -42,6 +50,25 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
       saveGame(next);
     }
   }, [game, now]);
+
+  useEffect(() => {
+    if (!game || game.status !== "revealing") return undefined;
+    const revealCount = sortGuessesForReveal(game).length;
+    if (game.revealStep > revealCount) return undefined;
+
+    const timer = window.setTimeout(() => {
+      setGame((current) => {
+        if (!current || current.status !== "revealing") return current;
+        if (current.revealStep > sortGuessesForReveal(current).length) return current;
+
+        const next = advanceReveal(current);
+        saveGame(next);
+        return next;
+      });
+    }, game.revealStep === 0 ? 800 : 2100);
+
+    return () => window.clearTimeout(timer);
+  }, [game?.revealStep, game?.roomCode, game?.status]);
 
   const joinUrl = useMemo(() => {
     if (!game) return "";
@@ -94,6 +121,7 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
 
   const round = game.rounds[game.currentRoundIndex];
   const guesses = getRoundGuesses(game);
+  const revealComplete = game.status === "revealing" && game.revealStep > sortGuessesForReveal(game).length;
   const confirmedCount = guesses.filter((guess) => guess.confirmed).length;
   const remainingSeconds = game.roundEndsAt
     ? Math.max(0, Math.ceil((new Date(game.roundEndsAt).getTime() - now) / 1000))
@@ -176,11 +204,11 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
         <section className="host-flow">
           <RevealMap game={game} />
           <div className="flow-actions">
-            <button className="secondary-action" type="button" onClick={() => persist(advanceReveal(game))}>
-              <ArrowRight size={18} /> Advance reveal
+            <button className="secondary-action" type="button" disabled={!revealComplete} onClick={() => persist(showScoreboard(game))}>
+              <Trophy size={18} /> Reveal scores
             </button>
-            <button className="primary-action" type="button" onClick={() => persist(showScoreboard(game))}>
-              <Trophy size={18} /> Scoreboard
+            <button className="primary-action" type="button" disabled={revealComplete} onClick={() => persist(advanceReveal(game))}>
+              <ArrowRight size={18} /> Step reveal
             </button>
           </div>
         </section>

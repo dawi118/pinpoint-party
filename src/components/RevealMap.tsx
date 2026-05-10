@@ -1,4 +1,3 @@
-import { formatDistance } from "../lib/geo";
 import { sortGuessesForReveal } from "../lib/gameState";
 import { GameState } from "../lib/types";
 import { WorldGuessMap } from "./WorldGuessMap";
@@ -10,6 +9,9 @@ export function RevealMap({ game }: { game: GameState }) {
   const current = visibleGuesses.at(-1);
   const player = current ? game.players.find((item) => item.id === current.playerId) : undefined;
   const showAnswer = game.revealStep > revealGuesses.length;
+  const progress = revealGuesses.length
+    ? Math.min(100, (game.revealStep / (revealGuesses.length + 1)) * 100)
+    : 100;
 
   return (
     <section className="reveal-layout">
@@ -27,24 +29,33 @@ export function RevealMap({ game }: { game: GameState }) {
         })}
       />
       <div className="reveal-callout">
-        {current && player ? (
-          <>
-            <span className="kicker">Reveal {Math.min(game.revealStep, revealGuesses.length)} of {revealGuesses.length}</span>
-            <h2>{player.displayName}</h2>
-            <p>{formatDistance(current.distanceKm)} away</p>
-            <strong>{current.score?.toLocaleString()} points</strong>
-          </>
-        ) : showAnswer ? (
+        {showAnswer ? (
           <>
             <span className="kicker">True location</span>
             <h2>{round.locationLabel}</h2>
             <p>{round.attribution}</p>
+            <div className="reveal-progress" aria-hidden="true">
+              <span style={{ width: "100%" }} />
+            </div>
+          </>
+        ) : current && player ? (
+          <>
+            <span className="kicker">Guess {Math.min(game.revealStep, revealGuesses.length)} of {revealGuesses.length}</span>
+            <h2>{player.displayName}</h2>
+            <p>The room is moving closer to the answer.</p>
+            <div className="reveal-progress" aria-hidden="true">
+              <span style={{ width: `${progress}%` }} />
+            </div>
+            <strong>Scores hidden</strong>
           </>
         ) : (
           <>
             <span className="kicker">Reveal ready</span>
             <h2>Furthest guess appears first</h2>
-            <p>Advance through the room, then reveal the answer.</p>
+            <p>The reveal will step through each pin before any points are shown.</p>
+            <div className="reveal-progress" aria-hidden="true">
+              <span style={{ width: "0%" }} />
+            </div>
           </>
         )}
       </div>

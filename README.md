@@ -15,10 +15,11 @@ This repo implements the first playable web prototype based on the supplied game
 - Rounds end when all players confirm or the timer expires.
 - Distances use the Haversine formula.
 - Scores use the exponential 5000-point formula from the plan.
-- Reveal order runs from furthest guess to closest guess, then the answer.
+- Reveal order auto-steps from furthest guess to closest guess, then the answer.
+- Scores stay hidden until the reveal slideshow has finished.
 - Rounds are selected randomly from a geographically accurate image bank with easy, medium, and hard clues.
 
-The prototype realtime layer is local-tab only through `BroadcastChannel` and `localStorage`. `supabase/schema.sql` is included for the production realtime backend.
+The app can run as a single-browser prototype through `BroadcastChannel` and `localStorage`, or as a same-Wi-Fi party server through Socket.IO. `supabase/schema.sql` is included for the production realtime backend.
 
 ## Tech Stack
 
@@ -28,6 +29,7 @@ The prototype realtime layer is local-tab only through `BroadcastChannel` and `l
 - CSS
 - MapLibre GL JS
 - OpenFreeMap vector street map style
+- Express + Socket.IO LAN host
 - Lucide React icons
 
 ## Run Locally
@@ -44,6 +46,22 @@ http://localhost:5173/
 ```
 
 Create a room, then open the join link in another tab to simulate a phone.
+
+## Play On Phones Over Wi-Fi
+
+For real phones on the same Wi-Fi network, use the LAN host server:
+
+```bash
+npm run host
+```
+
+Open the printed LAN URL on the laptop first, such as:
+
+```text
+http://192.168.1.191:4173/
+```
+
+Players should scan or open the join URL with that same laptop IP address. `localhost` only means "this device", so a phone visiting `localhost` will look at the phone itself, not the laptop. The LAN server keeps room state in memory with Socket.IO, so phones and the host share the same lobby, guesses, reveal, and scoreboard.
 
 ## Project Structure
 
@@ -77,6 +95,6 @@ docs
 
 1. Replace local prototype storage with Supabase Realtime.
 2. Add QR-code joining.
-3. Add MapLibre GL JS with a production tile provider.
+3. Add deployment hosting with a persistent realtime backend.
 4. Add host-uploaded content packs.
 5. Add reconnect handling with persisted host and player sessions.
