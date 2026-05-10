@@ -1,4 +1,5 @@
 import { pickRounds } from "./content";
+import { createId } from "./random";
 import { generateRoomCode } from "./roomCodes";
 import { scoreGuess } from "./scoring";
 import { GameState, Guess, Player } from "./types";
@@ -15,9 +16,9 @@ export function createInitialGame(options?: {
   const roomCode = options?.roomCode ?? generateRoomCode();
 
   return {
-    id: crypto.randomUUID(),
+    id: createId("game"),
     roomCode,
-    hostSessionId: crypto.randomUUID(),
+    hostSessionId: createId("host"),
     status: "lobby",
     roundCount,
     timerSeconds: options?.timerSeconds ?? 180,
@@ -41,7 +42,7 @@ export function addPlayer(game: GameState, displayName: string, preferredColor?:
   }
 
   const player: Player = {
-    id: crypto.randomUUID(),
+    id: createId("player"),
     displayName: finalName,
     color: preferredColor || COLORS[game.players.length % COLORS.length],
     avatar: AVATARS[game.players.length % AVATARS.length],

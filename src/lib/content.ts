@@ -1,4 +1,5 @@
 import { MediaRound } from "./types";
+import { randomInt } from "./random";
 
 export const CONTENT_BANK: MediaRound[] = [
   {
@@ -199,7 +200,7 @@ function shuffle(rounds: MediaRound[]): MediaRound[] {
   const next = [...rounds];
 
   for (let index = next.length - 1; index > 0; index -= 1) {
-    const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % (index + 1);
+    const randomIndex = randomInt(index + 1);
     [next[index], next[randomIndex]] = [next[randomIndex], next[index]];
   }
 
