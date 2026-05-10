@@ -344,6 +344,10 @@ select {
   touch-action: none;
 }
 
+.real-world-map {
+  background: #102238;
+}
+
 .world-map.is-locked {
   cursor: default;
 }
@@ -413,14 +417,13 @@ select {
   background: #cce4e9;
 }
 
-.map-pin {
-  position: absolute;
-  z-index: 4;
-  transform: translate(-50%, -100%);
-  pointer-events: none;
+.real-map-marker {
+  display: grid;
+  justify-items: center;
+  color: var(--marker-color);
 }
 
-.map-pin > span {
+.real-map-marker > span {
   display: block;
   width: 22px;
   height: 22px;
@@ -431,15 +434,7 @@ select {
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
-.map-pin.own {
-  color: #f6c85f;
-}
-
-.map-pin.actual {
-  color: #ff6b57;
-}
-
-.map-pin strong {
+.real-map-marker strong {
   display: block;
   min-width: max-content;
   margin-top: 0.15rem;
@@ -448,11 +443,11 @@ select {
   padding: 0.2rem 0.5rem;
   color: #ffffff;
   font-size: 0.78rem;
-  transform: translateX(-35%);
 }
 
 .map-empty {
   position: absolute;
+  z-index: 2;
   inset: 0;
   display: grid;
   place-content: center;
@@ -461,6 +456,8 @@ select {
   color: #eaf2fb;
   font-weight: 900;
   text-align: center;
+  pointer-events: none;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
 }
 
 .icon-action {

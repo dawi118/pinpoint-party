@@ -11,10 +11,12 @@ This repo implements the first playable web prototype based on the supplied game
 - Up to 8 players are supported.
 - Host sees lobby, round clue, confirmation status, reveal, scoreboard, and final state.
 - Player phones can place and confirm pins on a responsive world map.
+- Guessing uses MapLibre GL JS with an OpenFreeMap street-map style, including pinch and wheel zoom.
 - Rounds end when all players confirm or the timer expires.
 - Distances use the Haversine formula.
 - Scores use the exponential 5000-point formula from the plan.
 - Reveal order runs from furthest guess to closest guess, then the answer.
+- Rounds are selected randomly from a geographically accurate image bank with easy, medium, and hard clues.
 
 The prototype realtime layer is local-tab only through `BroadcastChannel` and `localStorage`. `supabase/schema.sql` is included for the production realtime backend.
 
@@ -24,6 +26,8 @@ The prototype realtime layer is local-tab only through `BroadcastChannel` and `l
 - React
 - TypeScript
 - CSS
+- MapLibre GL JS
+- OpenFreeMap vector street map style
 - Lucide React icons
 
 ## Run Locally
