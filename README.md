@@ -12,6 +12,7 @@ This repo implements the first playable web prototype based on the supplied game
 - Host sees lobby, round clue, confirmation status, reveal, scoreboard, and final state.
 - Player phones can place and confirm pins on a responsive world map.
 - Guessing uses MapLibre GL JS with an OpenFreeMap street-map style, including pinch and wheel zoom.
+- The player guessing map hides place and POI labels so map text cannot give away the answer.
 - Rounds end when all players confirm or the timer expires.
 - Distances use the Haversine formula.
 - Scores use the exponential 5000-point formula from the plan.

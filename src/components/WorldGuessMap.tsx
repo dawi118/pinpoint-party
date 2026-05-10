@@ -19,6 +19,7 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
   const markersRef = useRef<maplibregl.Marker[]>([]);
   const onChangeRef = useRef(onChange);
   const disabledRef = useRef(disabled);
+  const hidePlaceLabels = Boolean(onChange);
 
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -44,6 +45,10 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
     map.touchZoomRotate.enable();
     map.touchZoomRotate.disableRotation();
+
+    if (hidePlaceLabels) {
+      map.on("styledata", () => hideTextLabels(map));
+    }
 
     map.on("click", (event) => {
       if (disabledRef.current || !onChangeRef.current) return;
@@ -154,4 +159,17 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
       )}
     </div>
   );
+}
+
+function hideTextLabels(map: maplibregl.Map) {
+  const style = map.getStyle();
+  if (!style.layers) return;
+
+  style.layers.forEach((layer) => {
+    const layout = layer.layout as Record<string, unknown> | undefined;
+    const textField = layout?.["text-field"];
+    if (layer.type === "symbol" && textField) {
+      map.setLayoutProperty(layer.id, "visibility", "none");
+    }
+  });
 }
