@@ -16,8 +16,14 @@ The current app uses `localStorage` plus `BroadcastChannel` so multiple tabs can
 
 - `src/lib/geo.ts` contains Haversine distance and map projection helpers.
 - `src/lib/scoring.ts` implements the exponential 5000-point scoring formula.
-- `src/lib/gameState.ts` owns state transitions for lobby, active round, reveal, scoreboard, and final results.
+- `src/lib/gameState.ts` owns state transitions for lobby, active round, reveal, scoreboard, final results, and selected game mode.
 - `src/lib/roomCodes.ts` creates readable four-character room codes.
+
+## Game Modes
+
+- Pinpointer is the introductory landmark-photo mode: players place one pin and closest wins.
+- Earth Classic uses street-seeded rounds with a movable MapLibre view plus the same guess map, confirmation, reveal, and scoring flow.
+- Pin Central is present in the menu as a disabled placeholder for the future average-location challenge.
 
 ## Backend Path
 

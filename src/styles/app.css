@@ -89,6 +89,58 @@ a {
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
 }
 
+.mode-menu {
+  display: grid;
+  gap: 0.55rem;
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.mode-menu legend {
+  margin-bottom: 0.45rem;
+  color: #aab8cc;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.mode-menu button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: 62px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  padding: 0.7rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mode-menu button.selected {
+  border-color: rgba(246, 200, 95, 0.8);
+  background: rgba(246, 200, 95, 0.16);
+}
+
+.mode-menu button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.mode-menu strong,
+.mode-menu small {
+  display: block;
+}
+
+.mode-menu small {
+  color: #aeb9c9;
+  margin-top: 0.18rem;
+}
+
 label {
   display: grid;
   gap: 0.45rem;
@@ -258,6 +310,18 @@ select {
   object-fit: cover;
 }
 
+.round-stage > .earth-street-view {
+  position: absolute;
+  inset: 0;
+  min-height: 100%;
+  border-radius: 0;
+}
+
+.round-stage .earth-street-map {
+  height: 100%;
+  min-height: 100%;
+}
+
 .round-stage::after {
   content: "";
   position: absolute;
@@ -366,6 +430,52 @@ select {
 
 .world-map.is-locked {
   cursor: default;
+}
+
+.earth-street-view {
+  position: relative;
+  min-height: min(70vh, 680px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: #102238;
+}
+
+.earth-street-map {
+  width: 100%;
+  min-height: min(70vh, 680px);
+  cursor: pointer;
+}
+
+.street-reticle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: rgba(7, 11, 19, 0.5);
+  color: #f6c85f;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.street-compass {
+  position: absolute;
+  right: 0.85rem;
+  top: 0.85rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: rgba(7, 11, 19, 0.82);
+  color: #ffffff;
+  pointer-events: none;
 }
 
 .continents span {
@@ -557,11 +667,55 @@ select {
   min-height: 100vh;
 }
 
+.earth-classic-player {
+  grid-template-rows: auto auto 1fr auto;
+}
+
+.classic-view-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  padding: 0.55rem;
+  background: rgba(7, 11, 19, 0.92);
+}
+
+.classic-view-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #d7e0ec;
+  font-weight: 900;
+}
+
+.classic-view-tabs button.selected {
+  border-color: rgba(246, 200, 95, 0.82);
+  background: #f6c85f;
+  color: #16120a;
+}
+
+.classic-play-surface {
+  min-height: 0;
+}
+
 .player-game .world-map {
   min-height: calc(100vh - 170px);
   border-radius: 0;
   border-left: 0;
   border-right: 0;
+}
+
+.earth-classic-player .world-map,
+.earth-classic-player .earth-street-view,
+.earth-classic-player .earth-street-map {
+  min-height: calc(100vh - 218px);
+  border-left: 0;
+  border-right: 0;
+  border-radius: 0;
 }
 
 .phone-top > div {

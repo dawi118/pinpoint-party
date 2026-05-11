@@ -1,15 +1,17 @@
-import { Check, Clock, Trophy } from "lucide-react";
+import { Check, Clock, MapPinned, Route, Trophy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { confirmGuess, getRoundGuesses, upsertGuess } from "../lib/gameState";
 import { formatDistance } from "../lib/geo";
 import { fetchGame, loadGame, saveGame, subscribeToGame } from "../lib/localGameStore";
 import { GameState, Guess } from "../lib/types";
+import { EarthStreetView } from "./EarthStreetView";
 import { Scoreboard } from "./Scoreboard";
 import { WorldGuessMap } from "./WorldGuessMap";
 
 export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerId?: string }) {
   const [game, setGame] = useState<GameState | undefined>(() => loadGame(roomCode));
   const [now, setNow] = useState(Date.now());
+  const [classicView, setClassicView] = useState<"street" | "map">("street");
 
   useEffect(() => subscribeToGame(roomCode, setGame), [roomCode]);
   useEffect(() => {
@@ -24,6 +26,12 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
   }, []);
 
   const player = useMemo(() => game?.players.find((item) => item.id === playerId), [game, playerId]);
+
+  useEffect(() => {
+    if (game?.status === "round_active" && (game.mode ?? "pinpointer") === "earth_classic") {
+      setClassicView("street");
+    }
+  }, [game?.currentRoundIndex, game?.mode, game?.status]);
 
   if (!game || !player) {
     return (
@@ -51,6 +59,55 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
   };
 
   if (game.status === "round_active") {
+    const mode = game.mode ?? "pinpointer";
+
+    if (mode === "earth_classic") {
+      return (
+        <main className="app player-game earth-classic-player">
+          <header className="phone-top">
+            <div>
+              <span className="player-dot" style={{ background: player.color }} />
+              <strong>{player.displayName}</strong>
+            </div>
+            <span><Clock size={16} /> {Math.floor(remainingSeconds / 60)}:{String(remainingSeconds % 60).padStart(2, "0")}</span>
+          </header>
+          <section className="classic-view-tabs" aria-label="Earth Classic view">
+            <button className={classicView === "street" ? "selected" : ""} type="button" onClick={() => setClassicView("street")}>
+              <Route size={17} /> Street
+            </button>
+            <button className={classicView === "map" ? "selected" : ""} type="button" onClick={() => setClassicView("map")}>
+              <MapPinned size={17} /> Map
+            </button>
+          </section>
+          <section className="classic-play-surface">
+            {classicView === "street" ? (
+              <EarthStreetView round={round} />
+            ) : (
+              <WorldGuessMap
+                value={guess ? { lat: guess.lat, lng: guess.lng } : undefined}
+                disabled={guess?.confirmed}
+                onChange={(position) => persist(upsertGuess(game, player.id, position.lat, position.lng))}
+              />
+            )}
+          </section>
+          <section className="confirm-dock">
+            <div>
+              <span className="kicker">Earth Classic / Round {game.currentRoundIndex + 1}</span>
+              <strong>{guess?.confirmed ? "Guess confirmed" : "Find it, then pin it"}</strong>
+            </div>
+            <button
+              className="primary-action"
+              type="button"
+              disabled={!guess || guess.confirmed}
+              onClick={() => persist(confirmGuess(game, player.id))}
+            >
+              <Check size={18} /> Confirm
+            </button>
+          </section>
+        </main>
+      );
+    }
+
     return (
       <main className="app player-game">
         <header className="phone-top">

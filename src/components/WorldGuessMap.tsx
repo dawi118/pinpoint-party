@@ -161,7 +161,7 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
   );
 }
 
-function hideTextLabels(map: maplibregl.Map) {
+export function hideTextLabels(map: maplibregl.Map) {
   const style = map.getStyle();
   if (!style.layers) return;
 

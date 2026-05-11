@@ -1,4 +1,4 @@
-import { ArrowRight, Clock, Copy, Play, Trophy, Users } from "lucide-react";
+import { ArrowRight, Clock, Copy, Globe2, MapPinned, Play, Route, Trophy, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   advanceReveal,
@@ -14,7 +14,8 @@ import {
 } from "../lib/gameState";
 import { fetchGame, loadGame, saveGame, saveGameAndWait, subscribeToGame } from "../lib/localGameStore";
 import { generateRoomCode } from "../lib/roomCodes";
-import { GameState } from "../lib/types";
+import { GameMode, GameState } from "../lib/types";
+import { EarthStreetView } from "./EarthStreetView";
 import { RevealMap } from "./RevealMap";
 import { Scoreboard } from "./Scoreboard";
 
@@ -22,6 +23,7 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
   const [game, setGame] = useState<GameState | undefined>(() => (roomCode ? loadGame(roomCode) : undefined));
   const [roundCount, setRoundCount] = useState<3 | 5 | 10>(3);
   const [timerSeconds, setTimerSeconds] = useState(180);
+  const [mode, setMode] = useState<GameMode>("pinpointer");
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
@@ -88,11 +90,13 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
             className="setup-panel"
             onSubmit={async (event) => {
               event.preventDefault();
-              const next = createInitialGame({ roomCode: generateRoomCode(), roundCount, timerSeconds });
-              await saveGameAndWait(next);
+              const next = createInitialGame({ roomCode: generateRoomCode(), roundCount, timerSeconds, mode });
+              saveGame(next);
+              void saveGameAndWait(next);
               window.location.href = `/host/${next.roomCode}`;
             }}
           >
+            <ModeMenu value={mode} onChange={setMode} />
             <label>
               <span>Rounds</span>
               <select value={roundCount} onChange={(event) => setRoundCount(Number(event.target.value) as 3 | 5 | 10)}>
@@ -143,6 +147,7 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
           <span><Users size={16} /> {game.players.length}/8</span>
           <span><Clock size={16} /> {Math.floor(remainingSeconds / 60)}:{String(remainingSeconds % 60).padStart(2, "0")}</span>
           <span>Round {game.currentRoundIndex + 1}/{game.rounds.length}</span>
+          <span>{getModeLabel(game.mode ?? "pinpointer")}</span>
         </div>
       </header>
 
@@ -157,11 +162,15 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
             </button>
           </div>
           <div className="host-controls">
+            <ModeMenu
+              value={game.mode ?? "pinpointer"}
+              onChange={(nextMode) => persist(updateSettings(game, game.roundCount, game.timerSeconds, nextMode))}
+            />
             <label>
               <span>Rounds</span>
               <select
                 value={game.roundCount}
-                onChange={(event) => persist(updateSettings(game, Number(event.target.value) as 3 | 5 | 10, game.timerSeconds))}
+                onChange={(event) => persist(updateSettings(game, Number(event.target.value) as 3 | 5 | 10, game.timerSeconds, game.mode ?? "pinpointer"))}
               >
                 <option value={3}>3 rounds</option>
                 <option value={5}>5 rounds</option>
@@ -172,7 +181,7 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
               <span>Timer</span>
               <select
                 value={game.timerSeconds}
-                onChange={(event) => persist(updateSettings(game, game.roundCount, Number(event.target.value)))}
+                onChange={(event) => persist(updateSettings(game, game.roundCount, Number(event.target.value), game.mode ?? "pinpointer"))}
               >
                 <option value={60}>1 minute</option>
                 <option value={120}>2 minutes</option>
@@ -190,10 +199,14 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
 
       {game.status === "round_active" && (
         <section className="round-stage">
-          <img src={round.url} alt="Round clue" />
+          {(game.mode ?? "pinpointer") === "earth_classic" ? (
+            <EarthStreetView round={round} />
+          ) : (
+            <img src={round.url} alt="Round clue" />
+          )}
           <div className="round-overlay">
             <span className="kicker">{round.contentPack}</span>
-            <h1>Where was this taken?</h1>
+            <h1>{(game.mode ?? "pinpointer") === "earth_classic" ? "Explore, then pinpoint it" : "Where was this taken?"}</h1>
             <p>{confirmedCount} of {game.players.length} players locked in</p>
           </div>
           <PlayerList game={game} />
@@ -234,6 +247,39 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
       )}
     </main>
   );
+}
+
+function ModeMenu({ value, onChange }: { value: GameMode; onChange: (mode: GameMode) => void }) {
+  return (
+    <fieldset className="mode-menu">
+      <legend>Game mode</legend>
+      <button type="button" className={value === "pinpointer" ? "selected" : ""} onClick={() => onChange("pinpointer")}>
+        <MapPinned size={18} />
+        <span>
+          <strong>Pinpointer</strong>
+          <small>Famous landmarks, closest wins</small>
+        </span>
+      </button>
+      <button type="button" className={value === "earth_classic" ? "selected" : ""} onClick={() => onChange("earth_classic")}>
+        <Route size={18} />
+        <span>
+          <strong>Earth Classic</strong>
+          <small>Street exploration plus map guesses</small>
+        </span>
+      </button>
+      <button type="button" disabled>
+        <Globe2 size={18} />
+        <span>
+          <strong>Pin Central</strong>
+          <small>Several places, one central point</small>
+        </span>
+      </button>
+    </fieldset>
+  );
+}
+
+function getModeLabel(mode: GameMode) {
+  return mode === "earth_classic" ? "Earth Classic" : "Pinpointer";
 }
 
 function PlayerList({ game }: { game: GameState }) {

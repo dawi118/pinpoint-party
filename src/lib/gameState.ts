@@ -2,7 +2,7 @@ import { pickRounds } from "./content";
 import { createId } from "./random";
 import { generateRoomCode } from "./roomCodes";
 import { scoreGuess } from "./scoring";
-import { GameState, Guess, Player } from "./types";
+import { GameMode, GameState, Guess, Player } from "./types";
 
 const COLORS = ["#00A6A6", "#FF6B57", "#F6C85F", "#7B61FF", "#2FBF71", "#F55FA6", "#2D9CDB", "#F2994A"];
 const AVATARS = ["Compass", "Rocket", "Beacon", "Globe", "Flag", "Spark", "Radar", "Peak"];
@@ -11,21 +11,24 @@ export function createInitialGame(options?: {
   roomCode?: string;
   roundCount?: 3 | 5 | 10;
   timerSeconds?: number;
+  mode?: GameMode;
 }): GameState {
   const roundCount = options?.roundCount ?? 3;
   const roomCode = options?.roomCode ?? generateRoomCode();
+  const mode = options?.mode ?? "pinpointer";
 
   return {
     id: createId("game"),
     roomCode,
     hostSessionId: createId("host"),
     status: "lobby",
+    mode,
     roundCount,
     timerSeconds: options?.timerSeconds ?? 180,
     currentRoundIndex: 0,
     revealStep: 0,
     players: [],
-    rounds: pickRounds(roundCount),
+    rounds: pickRounds(roundCount, mode),
     guessesByRound: {},
     createdAt: new Date().toISOString()
   };
@@ -57,12 +60,13 @@ export function addPlayer(game: GameState, displayName: string, preferredColor?:
   };
 }
 
-export function updateSettings(game: GameState, roundCount: 3 | 5 | 10, timerSeconds: number): GameState {
+export function updateSettings(game: GameState, roundCount: 3 | 5 | 10, timerSeconds: number, mode: GameMode = game.mode ?? "pinpointer"): GameState {
   return {
     ...game,
+    mode,
     roundCount,
     timerSeconds,
-    rounds: pickRounds(roundCount)
+    rounds: pickRounds(roundCount, mode)
   };
 }
 

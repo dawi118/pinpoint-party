@@ -1,7 +1,7 @@
-import { MediaRound } from "./types";
+import { GameMode, MediaRound } from "./types";
 import { randomInt } from "./random";
 
-export const CONTENT_BANK: MediaRound[] = [
+export const PINPOINTER_CONTENT_BANK: MediaRound[] = [
   {
     id: "eiffel-tower",
     type: "image",
@@ -191,9 +191,173 @@ export const CONTENT_BANK: MediaRound[] = [
   }
 ];
 
-export function pickRounds(count: 3 | 5 | 10): MediaRound[] {
-  const needed = Math.min(count, CONTENT_BANK.length);
-  return shuffle(CONTENT_BANK).slice(0, needed);
+export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
+  {
+    id: "earth-classic-manhattan",
+    type: "street",
+    actualLat: 40.758,
+    actualLng: -73.9855,
+    locationLabel: "Times Square, New York",
+    contentPack: "Earth Classic",
+    difficulty: "easy",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 40.759,
+      startLng: -73.9845,
+      heading: 228,
+      zoom: 16.2
+    }
+  },
+  {
+    id: "earth-classic-westminster",
+    type: "street",
+    actualLat: 51.5007,
+    actualLng: -0.1246,
+    locationLabel: "Westminster, London",
+    contentPack: "Earth Classic",
+    difficulty: "easy",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 51.5014,
+      startLng: -0.1252,
+      heading: 148,
+      zoom: 16.4
+    }
+  },
+  {
+    id: "earth-classic-shibuya",
+    type: "street",
+    actualLat: 35.6595,
+    actualLng: 139.7005,
+    locationLabel: "Shibuya Crossing, Tokyo",
+    contentPack: "Earth Classic",
+    difficulty: "medium",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 35.6602,
+      startLng: 139.7001,
+      heading: 166,
+      zoom: 16.4
+    }
+  },
+  {
+    id: "earth-classic-montmartre",
+    type: "street",
+    actualLat: 48.8867,
+    actualLng: 2.3431,
+    locationLabel: "Montmartre, Paris",
+    contentPack: "Earth Classic",
+    difficulty: "medium",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 48.8861,
+      startLng: 2.3427,
+      heading: 38,
+      zoom: 16.3
+    }
+  },
+  {
+    id: "earth-classic-fremantle",
+    type: "street",
+    actualLat: -32.0569,
+    actualLng: 115.7439,
+    locationLabel: "Fremantle, Australia",
+    contentPack: "Earth Classic",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: -32.0558,
+      startLng: 115.7442,
+      heading: 192,
+      zoom: 15.9
+    }
+  },
+  {
+    id: "earth-classic-mexico-city",
+    type: "street",
+    actualLat: 19.4326,
+    actualLng: -99.1332,
+    locationLabel: "Centro Historico, Mexico City",
+    contentPack: "Earth Classic",
+    difficulty: "medium",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 19.4332,
+      startLng: -99.1341,
+      heading: 118,
+      zoom: 16.1
+    }
+  },
+  {
+    id: "earth-classic-cape-town",
+    type: "street",
+    actualLat: -33.9249,
+    actualLng: 18.4241,
+    locationLabel: "Cape Town City Bowl",
+    contentPack: "Earth Classic",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: -33.9244,
+      startLng: 18.4214,
+      heading: 76,
+      zoom: 15.8
+    }
+  },
+  {
+    id: "earth-classic-barcelona",
+    type: "street",
+    actualLat: 41.3851,
+    actualLng: 2.1734,
+    locationLabel: "Gothic Quarter, Barcelona",
+    contentPack: "Earth Classic",
+    difficulty: "medium",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 41.3839,
+      startLng: 2.1762,
+      heading: 278,
+      zoom: 16.3
+    }
+  },
+  {
+    id: "earth-classic-vancouver",
+    type: "street",
+    actualLat: 49.2827,
+    actualLng: -123.1207,
+    locationLabel: "Downtown Vancouver",
+    contentPack: "Earth Classic",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 49.2819,
+      startLng: -123.1212,
+      heading: 34,
+      zoom: 16
+    }
+  },
+  {
+    id: "earth-classic-venice",
+    type: "street",
+    actualLat: 45.4372,
+    actualLng: 12.3359,
+    locationLabel: "San Marco, Venice",
+    contentPack: "Earth Classic",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 45.4367,
+      startLng: 12.3372,
+      heading: 292,
+      zoom: 16.5
+    }
+  }
+];
+
+export function pickRounds(count: 3 | 5 | 10, mode: GameMode = "pinpointer"): MediaRound[] {
+  const bank = mode === "earth_classic" ? EARTH_CLASSIC_CONTENT_BANK : PINPOINTER_CONTENT_BANK;
+  const needed = Math.min(count, bank.length);
+  return shuffle(bank).slice(0, needed);
 }
 
 function shuffle(rounds: MediaRound[]): MediaRound[] {

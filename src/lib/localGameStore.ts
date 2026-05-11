@@ -7,11 +7,8 @@ let socket: Socket | undefined;
 const memoryCache = new Map<string, GameState>();
 
 export function loadGame(roomCode: string): GameState | undefined {
-  const cached = memoryCache.get(roomCode);
-  if (cached) return cached;
-
   const raw = localStorage.getItem(gameKey(roomCode));
-  if (!raw) return undefined;
+  if (!raw) return memoryCache.get(roomCode);
 
   try {
     const game = JSON.parse(raw) as GameState;
@@ -26,7 +23,7 @@ export async function fetchGame(roomCode: string): Promise<GameState | undefined
   const local = loadGame(roomCode);
   const activeSocket = getSocket();
 
-  if (!activeSocket) return local;
+  if (!activeSocket || local) return local;
 
   const remote = await activeSocket.timeout(3000).emitWithAck("game:load", roomCode).catch(() => undefined);
   if (!remote) {
@@ -65,6 +62,22 @@ export async function saveGameAndWait(game: GameState): Promise<boolean> {
 export function subscribeToGame(roomCode: string, onChange: (game: GameState) => void) {
   const cleanups: Array<() => void> = [];
   const activeSocket = getSocket();
+  const key = gameKey(roomCode);
+
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key !== key || !event.newValue) return;
+
+    try {
+      const game = JSON.parse(event.newValue) as GameState;
+      cacheGame(game);
+      onChange(game);
+    } catch {
+      return;
+    }
+  };
+
+  window.addEventListener("storage", handleStorage);
+  cleanups.push(() => window.removeEventListener("storage", handleStorage));
 
   if ("BroadcastChannel" in window) {
     const channel = new BroadcastChannel(channelName(roomCode));

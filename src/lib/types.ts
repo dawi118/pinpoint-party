@@ -1,9 +1,17 @@
 export type GameStatus = "lobby" | "round_active" | "revealing" | "scoreboard" | "finished";
+export type GameMode = "pinpointer" | "earth_classic";
+
+export type StreetViewSeed = {
+  startLat: number;
+  startLng: number;
+  heading: number;
+  zoom: number;
+};
 
 export type MediaRound = {
   id: string;
-  type: "image" | "video";
-  url: string;
+  type: "image" | "video" | "street";
+  url?: string;
   thumbnailUrl?: string;
   actualLat: number;
   actualLng: number;
@@ -11,6 +19,7 @@ export type MediaRound = {
   contentPack: string;
   difficulty: "easy" | "medium" | "hard";
   attribution: string;
+  streetView?: StreetViewSeed;
 };
 
 export type Player = {
@@ -38,6 +47,7 @@ export type GameState = {
   roomCode: string;
   hostSessionId: string;
   status: GameStatus;
+  mode: GameMode;
   roundCount: 3 | 5 | 10;
   timerSeconds: number;
   currentRoundIndex: number;
