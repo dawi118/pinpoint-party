@@ -19,6 +19,21 @@ const io = new Server(httpServer, {
   }
 });
 
+app.get("/api/network-info", (request, response) => {
+  const host = request.headers.host ?? `localhost:${port}`;
+  const protocol = request.headers["x-forwarded-proto"] ?? request.protocol;
+  const origin = `${protocol}://${host}`;
+  const requestPort = host.split(":")[1] ?? String(port);
+  const lanOrigins = getLanAddresses().map((address) => `http://${address}:${requestPort}`);
+  const isLocalhost = host.startsWith("localhost") || host.startsWith("127.0.0.1");
+
+  response.json({
+    origin,
+    lanOrigins,
+    preferredOrigin: isLocalhost ? lanOrigins[0] ?? origin : origin
+  });
+});
+
 app.use(express.static(distDir));
 app.use((request, response, next) => {
   if (request.method !== "GET") {

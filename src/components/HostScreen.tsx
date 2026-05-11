@@ -1,5 +1,6 @@
-import { ArrowRight, Clock, Copy, Globe2, MapPinned, Play, Route, Trophy, Users } from "lucide-react";
+import { ArrowRight, Clock, Copy, Globe2, MapPinned, Play, RotateCcw, Route, Trophy, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import QRCode from "qrcode";
 import {
   advanceReveal,
   advanceRound,
@@ -14,12 +15,21 @@ import {
   startRound,
   updateSettings
 } from "../lib/gameState";
-import { fetchGame, loadGame, saveGame, saveGameAndWait, subscribeToGame } from "../lib/localGameStore";
+import { fetchGame, fetchRemoteGame, loadGame, saveGame, saveGameAndWait, subscribeToGame } from "../lib/localGameStore";
 import { generateRoomCode } from "../lib/roomCodes";
 import { GameMode, GameState } from "../lib/types";
 import { EarthStreetView } from "./EarthStreetView";
 import { RevealMap } from "./RevealMap";
 import { Scoreboard } from "./Scoreboard";
+
+const SCENIC_IMAGES = [
+  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=900&q=80"
+];
 
 export function HostScreen({ roomCode }: { roomCode?: string }) {
   const [game, setGame] = useState<GameState | undefined>(() => (roomCode ? loadGame(roomCode) : undefined));
@@ -27,6 +37,7 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
   const [timerSeconds, setTimerSeconds] = useState(180);
   const [mode, setMode] = useState<GameMode>("pinpointer");
   const [now, setNow] = useState(Date.now());
+  const [mobileOrigin, setMobileOrigin] = useState<string | undefined>();
 
   useEffect(() => {
     if (!roomCode) return undefined;
@@ -41,8 +52,46 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
   }, [game, roomCode]);
 
   useEffect(() => {
+    if (!roomCode || !game) return;
+    let active = true;
+
+    void fetchRemoteGame(roomCode).then((remoteGame) => {
+      if (!active) return;
+      if (remoteGame) {
+        setGame(remoteGame);
+        return;
+      }
+
+      void saveGameAndWait(game);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [game?.id, roomCode]);
+
+  useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 500);
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadNetworkInfo = async () => {
+      const info = await fetch("/api/network-info")
+        .then((response) => response.ok ? response.json() as Promise<{ preferredOrigin?: string }> : undefined)
+        .catch(() => undefined);
+
+      if (active) setMobileOrigin(info?.preferredOrigin?.replace(/\/$/, ""));
+    };
+
+    void loadNetworkInfo();
+    const timer = window.setInterval(loadNetworkInfo, 10000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
   }, []);
 
   useEffect(() => {
@@ -110,15 +159,16 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
   const joinUrl = useMemo(() => {
     if (!game) return "";
     const publicOrigin = import.meta.env.VITE_PUBLIC_ORIGIN as string | undefined;
-    const origin = publicOrigin?.replace(/\/$/, "") || window.location.origin;
+    const origin = publicOrigin?.replace(/\/$/, "") || mobileOrigin || window.location.origin;
     return `${origin}/join?room=${game.roomCode}`;
-  }, [game]);
+  }, [game, mobileOrigin]);
   const isLocalhostOrigin = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 
   if (!roomCode || !game) {
     return (
       <main className="app host-create">
         <section className="host-hero">
+          <ScenicBackdrop />
           <div>
             <span className="kicker">TV-led mobile party game</span>
             <h1>Pinpoint Party</h1>
@@ -129,8 +179,8 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
             onSubmit={async (event) => {
               event.preventDefault();
               const next = createInitialGame({ roomCode: generateRoomCode(), roundCount, timerSeconds, mode });
-              saveGame(next);
-              void saveGameAndWait(next);
+              const synced = await saveGameAndWait(next);
+              if (!synced) saveGame(next);
               window.location.href = `/host/${next.roomCode}`;
             }}
           >
@@ -170,11 +220,16 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
   const nextRoundCountdown = game.nextRoundStartsAt
     ? Math.max(0, Math.ceil((new Date(game.nextRoundStartsAt).getTime() - now) / 1000))
     : 0;
-  const remainingSeconds = game.roundEndsAt
-    ? Math.max(0, Math.ceil((new Date(game.roundEndsAt).getTime() - now) / 1000))
-    : game.nextRoundStartsAt
-      ? nextRoundCountdown
-      : game.timerSeconds;
+  const roundCountdown = game.roundEndsAt
+    ? Math.max(0, Math.min(game.timerSeconds, Math.ceil((new Date(game.roundEndsAt).getTime() - now) / 1000)))
+    : game.timerSeconds;
+  const displayedSeconds =
+    game.status === "round_active"
+      ? roundCountdown
+      : game.status === "scoreboard"
+        ? nextRoundCountdown
+        : 0;
+  const showClock = game.status === "round_active" || game.status === "scoreboard";
 
   const persist = (next: GameState) => {
     setGame(next);
@@ -190,7 +245,9 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
         </div>
         <div className="status-pills">
           <span><Users size={16} /> {game.players.length}/8</span>
-          <span><Clock size={16} /> {Math.floor(remainingSeconds / 60)}:{String(remainingSeconds % 60).padStart(2, "0")}</span>
+          {showClock && (
+            <span><Clock size={16} /> {Math.floor(displayedSeconds / 60)}:{String(displayedSeconds % 60).padStart(2, "0")}</span>
+          )}
           <span>Round {game.currentRoundIndex + 1}/{game.rounds.length}</span>
           <span>{getModeLabel(game.mode ?? "pinpointer")}</span>
         </div>
@@ -199,11 +256,13 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
       {game.status === "lobby" && (
         <section className="lobby-grid">
           <div className="join-band">
+            <ScenicBackdrop />
             <span className="kicker">Join on your phone</span>
             <h1>{game.roomCode}</h1>
-            <p>{joinUrl}</p>
-            {isLocalhostOrigin && (
-              <p className="join-warning">Phones need the LAN or hosted URL, not localhost.</p>
+            <JoinQrCode value={joinUrl} />
+            <p className="join-url">{joinUrl}</p>
+            {isLocalhostOrigin && !mobileOrigin && (
+              <p className="join-warning">Open the host from the LAN address so phones do not scan localhost.</p>
             )}
             <button className="secondary-action" type="button" onClick={() => navigator.clipboard?.writeText(joinUrl)}>
               <Copy size={18} /> Copy join link
@@ -254,7 +313,7 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
           )}
           <div className="round-overlay">
             <span className="kicker">{round.contentPack}</span>
-            <h1>{(game.mode ?? "pinpointer") === "earth_classic" ? "Explore, then pinpoint it" : "Where was this taken?"}</h1>
+            <h1>{(game.mode ?? "pinpointer") === "earth_classic" ? "Explore the street map, then pinpoint it" : "Where was this taken?"}</h1>
             <p>{confirmedCount} of {game.players.length} players locked in</p>
           </div>
           <PlayerList game={game} />
@@ -300,10 +359,57 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
         <section className="scoreboard-stage final">
           <span className="kicker">Final leaderboard</span>
           <h1>{game.players[0] ? "Champion crowned" : "Game complete"}</h1>
-          <Scoreboard game={game} />
+          <Scoreboard game={game} showDistances={false} />
+          <a className="primary-action final-action" href="/">
+            <RotateCcw size={18} /> New game
+          </a>
         </section>
       )}
     </main>
+  );
+}
+
+function ScenicBackdrop() {
+  return (
+    <div className="scenic-backdrop" aria-hidden="true">
+      {SCENIC_IMAGES.map((imageUrl) => (
+        <span key={imageUrl} style={{ backgroundImage: `url(${imageUrl})` }} />
+      ))}
+    </div>
+  );
+}
+
+function JoinQrCode({ value }: { value: string }) {
+  const [imageUrl, setImageUrl] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    if (!value) {
+      setImageUrl("");
+      return undefined;
+    }
+
+    void QRCode.toDataURL(value, {
+      width: 240,
+      margin: 1,
+      color: {
+        dark: "#111827",
+        light: "#ffffff"
+      }
+    }).then((nextImageUrl) => {
+      if (active) setImageUrl(nextImageUrl);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [value]);
+
+  return (
+    <div className="join-qr">
+      {imageUrl ? <img src={imageUrl} alt="QR code to join this room" /> : <span />}
+    </div>
   );
 }
 
@@ -322,7 +428,7 @@ function ModeMenu({ value, onChange }: { value: GameMode; onChange: (mode: GameM
         <Route size={18} />
         <span>
           <strong>Earth Classic</strong>
-          <small>Street exploration plus map guesses</small>
+          <small>Street-map exploration plus map guesses</small>
         </span>
       </button>
       <button type="button" disabled>

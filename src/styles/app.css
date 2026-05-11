@@ -50,12 +50,20 @@ a {
 }
 
 .host-hero {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
   gap: 3rem;
   align-items: end;
   min-height: 100vh;
   padding: clamp(2rem, 6vw, 5rem);
+  overflow: hidden;
+}
+
+.host-hero > div,
+.host-hero > form {
+  position: relative;
+  z-index: 1;
 }
 
 .host-hero h1,
@@ -75,6 +83,68 @@ a {
   font-size: 1.1rem;
   line-height: 1.55;
   margin: 0;
+}
+
+.scenic-backdrop {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.scenic-backdrop span {
+  min-width: 0;
+  background-position: center;
+  background-size: cover;
+  filter: saturate(1.08) contrast(0.98);
+}
+
+.scenic-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(12, 17, 29, 0.96), rgba(12, 17, 29, 0.62) 48%, rgba(12, 17, 29, 0.9)),
+    linear-gradient(0deg, rgba(12, 17, 29, 0.96), transparent 34%, rgba(12, 17, 29, 0.9));
+}
+
+.join-band .scenic-backdrop {
+  border-radius: inherit;
+  opacity: 0.5;
+}
+
+.join-band .scenic-backdrop::after {
+  background:
+    linear-gradient(135deg, rgba(0, 166, 166, 0.48), rgba(123, 97, 255, 0.2)),
+    linear-gradient(90deg, rgba(17, 24, 39, 0.92), rgba(17, 24, 39, 0.72));
+}
+
+.join-qr {
+  display: grid;
+  place-items: center;
+  width: min(100%, 260px);
+  aspect-ratio: 1;
+  margin: 0.5rem 0 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 0.65rem;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
+}
+
+.join-qr img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.join-qr span {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #eef2f7, #ffffff);
 }
 
 .setup-panel,
@@ -241,14 +311,19 @@ select {
 }
 
 .join-band {
+  position: relative;
   display: grid;
   align-content: center;
   min-height: 60vh;
   border-radius: 8px;
-  background:
-    linear-gradient(135deg, rgba(0, 166, 166, 0.38), rgba(123, 97, 255, 0.18)),
-    #111827;
+  overflow: hidden;
+  background: #111827;
   padding: clamp(1.5rem, 5vw, 4rem);
+}
+
+.join-band > :not(.scenic-backdrop) {
+  position: relative;
+  z-index: 1;
 }
 
 .join-band h1 {
@@ -259,6 +334,12 @@ select {
 .join-warning {
   color: #ffd88a;
   font-weight: 800;
+}
+
+.join-url {
+  max-width: 620px;
+  overflow-wrap: anywhere;
+  font-size: 0.95rem;
 }
 
 .player-list {
@@ -661,6 +742,11 @@ select {
   grid-template-columns: auto auto minmax(0, 1fr) auto;
 }
 
+.final-action {
+  width: fit-content;
+  min-width: 180px;
+}
+
 .phone-shell {
   display: grid;
   place-items: center;
@@ -696,6 +782,13 @@ select {
 
 .form-error {
   color: #ffb6aa;
+}
+
+.final-waiting {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.85rem;
 }
 
 .player-game {
@@ -808,6 +901,10 @@ select {
 
   .host-hero {
     align-content: end;
+  }
+
+  .scenic-backdrop {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .top-bar {

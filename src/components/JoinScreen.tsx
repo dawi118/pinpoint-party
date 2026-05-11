@@ -16,7 +16,12 @@ export function JoinScreen({ initialRoomCode }: { initialRoomCode?: string }) {
     const game = await fetchGame(code);
 
     if (!game) {
-      setError("Room not found on this prototype device. Open the host room in another tab first.");
+      setError("Room not found on the host computer. Check that the host lobby is open and you scanned the LAN QR code.");
+      return;
+    }
+
+    if (game.status !== "lobby") {
+      setError("This game is already in progress. Ask the host to create a new room.");
       return;
     }
 

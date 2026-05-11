@@ -73,7 +73,7 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
           </header>
           <section className="classic-view-tabs" aria-label="Earth Classic view">
             <button className={classicView === "street" ? "selected" : ""} type="button" onClick={() => setClassicView("street")}>
-              <Route size={17} /> Street
+              <Route size={17} /> Explore
             </button>
             <button className={classicView === "map" ? "selected" : ""} type="button" onClick={() => setClassicView("map")}>
               <MapPinned size={17} /> Map
@@ -93,7 +93,7 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
           <section className="confirm-dock">
             <div>
               <span className="kicker">Earth Classic / Round {game.currentRoundIndex + 1}</span>
-              <strong>{guess?.confirmed ? "Guess confirmed" : "Find it, then pin it"}</strong>
+              <strong>{guess?.confirmed ? "Guess confirmed" : "Explore, then pin it"}</strong>
             </div>
             <button
               className="primary-action"
@@ -164,7 +164,9 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
         {game.status === "scoreboard" && (
           <>
             <PlayerResult guess={ownGuess} locationLabel={round.locationLabel} />
-            {!isFinalRound && (
+            {isFinalRound ? (
+              <p className="final-waiting">Final leaderboard is coming up on the main screen.</p>
+            ) : (
               <button
                 className="primary-action"
                 type="button"

@@ -25,11 +25,22 @@ export async function fetchGame(roomCode: string): Promise<GameState | undefined
 
   if (!activeSocket || local) return local;
 
-  const remote = await activeSocket.timeout(3000).emitWithAck("game:load", roomCode).catch(() => undefined);
+  const remote = await loadRemoteGame(activeSocket, roomCode);
   if (!remote) {
     if (local) activeSocket.emit("game:save", local);
     return local;
   }
+
+  cacheGame(remote as GameState);
+  return remote as GameState;
+}
+
+export async function fetchRemoteGame(roomCode: string): Promise<GameState | undefined> {
+  const activeSocket = getSocket();
+  if (!activeSocket) return undefined;
+
+  const remote = await loadRemoteGame(activeSocket, roomCode);
+  if (!remote) return undefined;
 
   cacheGame(remote as GameState);
   return remote as GameState;
@@ -162,6 +173,10 @@ function getSocket() {
   });
 
   return socket;
+}
+
+function loadRemoteGame(activeSocket: Socket, roomCode: string) {
+  return activeSocket.timeout(3000).emitWithAck("game:load", roomCode).catch(() => undefined);
 }
 
 function waitForSocket(activeSocket: Socket, timeoutMs: number): Promise<boolean> {

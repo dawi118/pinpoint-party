@@ -2,7 +2,15 @@ import { formatDistance } from "../lib/geo";
 import { getRoundGuesses, rankedPlayers } from "../lib/gameState";
 import { GameState } from "../lib/types";
 
-export function Scoreboard({ game, compact = false }: { game: GameState; compact?: boolean }) {
+export function Scoreboard({
+  game,
+  compact = false,
+  showDistances = !compact
+}: {
+  game: GameState;
+  compact?: boolean;
+  showDistances?: boolean;
+}) {
   const guesses = getRoundGuesses(game);
 
   return (
@@ -15,7 +23,7 @@ export function Scoreboard({ game, compact = false }: { game: GameState; compact
             <span className="player-dot" style={{ background: player.color }} />
             <div>
               <strong>{player.displayName}</strong>
-              {!compact && <small>{formatDistance(guess?.distanceKm)}</small>}
+              {showDistances && <small>{formatDistance(guess?.distanceKm)}</small>}
             </div>
             <b>{player.totalScore.toLocaleString()}</b>
           </li>
