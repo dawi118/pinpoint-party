@@ -50,9 +50,9 @@ export function RevealMap({ game }: { game: GameState }) {
           </>
         ) : (
           <>
-            <span className="kicker">Reveal ready</span>
-            <h2>Furthest guess appears first</h2>
-            <p>The reveal will step through each pin before any points are shown.</p>
+            <span className="kicker">Scores on the doors</span>
+            <h2>Drumroll please...</h2>
+            <p>The furthest guess will appear first.</p>
             <div className="reveal-progress" aria-hidden="true">
               <span style={{ width: "0%" }} />
             </div>

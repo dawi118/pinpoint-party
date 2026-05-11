@@ -4,8 +4,10 @@ import {
   advanceReveal,
   advanceRound,
   allPlayersConfirmed,
+  allPlayersReady,
   createInitialGame,
   finishRound,
+  getReadyPlayerCount,
   getRoundGuesses,
   showScoreboard,
   sortGuessesForReveal,
@@ -65,15 +67,51 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
         saveGame(next);
         return next;
       });
-    }, game.revealStep === 0 ? 800 : 2100);
+    }, game.revealStep === 0 ? 3600 : 2100);
 
     return () => window.clearTimeout(timer);
   }, [game?.revealStep, game?.roomCode, game?.status]);
 
+  useEffect(() => {
+    if (!game || game.status !== "revealing") return undefined;
+    const revealComplete = game.revealStep > sortGuessesForReveal(game).length;
+    if (!revealComplete) return undefined;
+
+    const timer = window.setTimeout(() => {
+      setGame((current) => {
+        if (!current || current.status !== "revealing") return current;
+        if (current.revealStep <= sortGuessesForReveal(current).length) return current;
+
+        const next = showScoreboard(current);
+        saveGame(next);
+        return next;
+      });
+    }, 3200);
+
+    return () => window.clearTimeout(timer);
+  }, [game?.revealStep, game?.roomCode, game?.status]);
+
+  useEffect(() => {
+    if (!game || game.status !== "scoreboard") return;
+
+    const isFinalRound = game.currentRoundIndex + 1 >= game.rounds.length;
+    const countdownExpired = game.nextRoundStartsAt ? new Date(game.nextRoundStartsAt).getTime() <= now : false;
+    const shouldAdvance = countdownExpired || (!isFinalRound && allPlayersReady(game));
+
+    if (shouldAdvance) {
+      const next = advanceRound(game);
+      setGame(next);
+      saveGame(next);
+    }
+  }, [game, now]);
+
   const joinUrl = useMemo(() => {
     if (!game) return "";
-    return `${window.location.origin}/join?room=${game.roomCode}`;
+    const publicOrigin = import.meta.env.VITE_PUBLIC_ORIGIN as string | undefined;
+    const origin = publicOrigin?.replace(/\/$/, "") || window.location.origin;
+    return `${origin}/join?room=${game.roomCode}`;
   }, [game]);
+  const isLocalhostOrigin = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 
   if (!roomCode || !game) {
     return (
@@ -123,9 +161,16 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
   const guesses = getRoundGuesses(game);
   const revealComplete = game.status === "revealing" && game.revealStep > sortGuessesForReveal(game).length;
   const confirmedCount = guesses.filter((guess) => guess.confirmed).length;
+  const readyCount = getReadyPlayerCount(game);
+  const isFinalRound = game.currentRoundIndex + 1 >= game.rounds.length;
+  const nextRoundCountdown = game.nextRoundStartsAt
+    ? Math.max(0, Math.ceil((new Date(game.nextRoundStartsAt).getTime() - now) / 1000))
+    : 0;
   const remainingSeconds = game.roundEndsAt
     ? Math.max(0, Math.ceil((new Date(game.roundEndsAt).getTime() - now) / 1000))
-    : game.timerSeconds;
+    : game.nextRoundStartsAt
+      ? nextRoundCountdown
+      : game.timerSeconds;
 
   const persist = (next: GameState) => {
     setGame(next);
@@ -152,6 +197,9 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
             <span className="kicker">Join on your phone</span>
             <h1>{game.roomCode}</h1>
             <p>{joinUrl}</p>
+            {isLocalhostOrigin && (
+              <p className="join-warning">Phones need the LAN or hosted URL, not localhost.</p>
+            )}
             <button className="secondary-action" type="button" onClick={() => navigator.clipboard?.writeText(joinUrl)}>
               <Copy size={18} /> Copy join link
             </button>
@@ -203,13 +251,12 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
       {game.status === "revealing" && (
         <section className="host-flow">
           <RevealMap game={game} />
-          <div className="flow-actions">
-            <button className="secondary-action" type="button" disabled={!revealComplete} onClick={() => persist(showScoreboard(game))}>
-              <Trophy size={18} /> Reveal scores
-            </button>
-            <button className="primary-action" type="button" disabled={revealComplete} onClick={() => persist(advanceReveal(game))}>
-              <ArrowRight size={18} /> Step reveal
-            </button>
+          <div className="flow-status" aria-live="polite">
+            {revealComplete ? (
+              <span><Trophy size={18} /> Scores coming up</span>
+            ) : (
+              <span><ArrowRight size={18} /> Reveal advancing automatically</span>
+            )}
           </div>
         </section>
       )}
@@ -219,9 +266,20 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
           <span className="kicker">Round complete</span>
           <h1>{round.locationLabel}</h1>
           <Scoreboard game={game} />
-          <button className="primary-action" type="button" onClick={() => persist(advanceRound(game))}>
-            <ArrowRight size={18} /> {game.currentRoundIndex + 1 >= game.rounds.length ? "Final results" : "Next round"}
-          </button>
+          <div className="ready-panel">
+            {isFinalRound ? (
+              <>
+                <span className="kicker">Game complete</span>
+                <strong>Final leaderboard in {nextRoundCountdown}s</strong>
+              </>
+            ) : (
+              <>
+                <span className="kicker">Next round starts automatically</span>
+                <strong>{readyCount} of {game.players.length} players ready</strong>
+                <p>Starting in {nextRoundCountdown}s unless everyone readies up first.</p>
+              </>
+            )}
+          </div>
         </section>
       )}
 

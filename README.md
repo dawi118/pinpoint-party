@@ -66,6 +66,20 @@ Players should scan or open the join URL with that same laptop IP address. `loca
 
 Create the host room from the LAN URL too, not the Vite dev URL, when playing with phones. If the laptop is using `http://localhost:5173/`, phones will reach the login screen but will not see the same server-backed room.
 
+## Deploy To A Public URL
+
+This game needs a long-running Node server for Socket.IO room sync, so deploy it to a Node-capable host such as Render, Railway, or Fly.io. A static-only Netlify deploy will load the UI but will not keep the host and phones in the same live room unless you add a separate realtime backend.
+
+The repo includes `render.yaml` for Render. Create a new Render Blueprint from the GitHub repo, then open the Render URL as the host screen. Phones should join from that same public URL.
+
+If the deployed app is behind a custom domain or reverse proxy, set:
+
+```text
+VITE_PUBLIC_ORIGIN=https://your-game.example.com
+```
+
+The host screen uses that value when showing the phone join link.
+
 ## Project Structure
 
 ```text

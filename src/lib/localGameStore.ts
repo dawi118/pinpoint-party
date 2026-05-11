@@ -65,11 +65,29 @@ export async function saveGameAndWait(game: GameState): Promise<boolean> {
 export function subscribeToGame(roomCode: string, onChange: (game: GameState) => void) {
   const cleanups: Array<() => void> = [];
   const activeSocket = getSocket();
+  let lastStoredGame = localStorage.getItem(gameKey(roomCode));
+
+  const storagePollTimer = window.setInterval(() => {
+    const raw = localStorage.getItem(gameKey(roomCode));
+    if (!raw || raw === lastStoredGame) return;
+
+    try {
+      const game = JSON.parse(raw) as GameState;
+      lastStoredGame = raw;
+      memoryCache.set(roomCode, game);
+      onChange(game);
+    } catch {
+      // Ignore malformed local cache entries.
+    }
+  }, 750);
+
+  cleanups.push(() => window.clearInterval(storagePollTimer));
 
   if ("BroadcastChannel" in window) {
     const channel = new BroadcastChannel(channelName(roomCode));
     channel.onmessage = (event) => {
       cacheGame(event.data as GameState);
+      lastStoredGame = localStorage.getItem(gameKey(roomCode));
       onChange(event.data as GameState);
     };
     cleanups.push(() => channel.close());
@@ -79,6 +97,7 @@ export function subscribeToGame(roomCode: string, onChange: (game: GameState) =>
     const handleUpdate = (game: GameState) => {
       if (game.roomCode !== roomCode) return;
       cacheGame(game);
+      lastStoredGame = localStorage.getItem(gameKey(roomCode));
       onChange(game);
     };
 
@@ -88,6 +107,27 @@ export function subscribeToGame(roomCode: string, onChange: (game: GameState) =>
       if (game) onChange(game);
     });
     cleanups.push(() => activeSocket.off("game:update", handleUpdate));
+
+    let polling = false;
+    const pollTimer = window.setInterval(() => {
+      if (polling) return;
+      polling = true;
+
+      void activeSocket.timeout(1200).emitWithAck("game:load", roomCode)
+        .then((remote) => {
+          if (!remote) return;
+          const game = remote as GameState;
+          cacheGame(game);
+          lastStoredGame = localStorage.getItem(gameKey(roomCode));
+          onChange(game);
+        })
+        .catch(() => undefined)
+        .finally(() => {
+          polling = false;
+        });
+    }, 1500);
+
+    cleanups.push(() => window.clearInterval(pollTimer));
   }
 
   return () => cleanups.forEach((cleanup) => cleanup());
