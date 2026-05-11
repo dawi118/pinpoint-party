@@ -1,6 +1,6 @@
 import { Check, Clock, MapPinned, Route, Trophy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { confirmGuess, getRoundGuesses, upsertGuess } from "../lib/gameState";
+import { confirmGuess, getRoundGuesses, markPlayerReady, upsertGuess } from "../lib/gameState";
 import { formatDistance } from "../lib/geo";
 import { fetchGame, loadGame, saveGame, subscribeToGame } from "../lib/localGameStore";
 import { GameState, Guess } from "../lib/types";
@@ -141,6 +141,8 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
   }
 
   const ownGuess = guesses.find((item) => item.playerId === player.id);
+  const isFinalRound = game.currentRoundIndex + 1 >= game.rounds.length;
+  const isReady = (game.readyPlayerIds ?? []).includes(player.id);
 
   return (
     <main className="app phone-shell">
@@ -160,7 +162,19 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
           </>
         )}
         {game.status === "scoreboard" && (
-          <PlayerResult guess={ownGuess} locationLabel={round.locationLabel} />
+          <>
+            <PlayerResult guess={ownGuess} locationLabel={round.locationLabel} />
+            {!isFinalRound && (
+              <button
+                className="primary-action"
+                type="button"
+                disabled={isReady}
+                onClick={() => persist(markPlayerReady(game, player.id))}
+              >
+                <Check size={18} /> {isReady ? "Ready" : "Ready for next round"}
+              </button>
+            )}
+          </>
         )}
         {game.status === "finished" && (
           <>

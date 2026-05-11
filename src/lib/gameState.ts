@@ -6,6 +6,7 @@ import { GameMode, GameState, Guess, Player } from "./types";
 
 const COLORS = ["#00A6A6", "#FF6B57", "#F6C85F", "#7B61FF", "#2FBF71", "#F55FA6", "#2D9CDB", "#F2994A"];
 const AVATARS = ["Compass", "Rocket", "Beacon", "Globe", "Flag", "Spark", "Radar", "Peak"];
+export const SCOREBOARD_COUNTDOWN_SECONDS = 15;
 
 export function createInitialGame(options?: {
   roomCode?: string;
@@ -79,6 +80,9 @@ export function startRound(game: GameState): GameState {
     revealStep: 0,
     roundStartedAt: new Date(now).toISOString(),
     roundEndsAt: new Date(now + game.timerSeconds * 1000).toISOString(),
+    scoreboardStartedAt: undefined,
+    nextRoundStartsAt: undefined,
+    readyPlayerIds: [],
     guessesByRound: {
       ...game.guessesByRound,
       [game.currentRoundIndex]: game.guessesByRound[game.currentRoundIndex] ?? []
@@ -179,9 +183,14 @@ export function advanceReveal(game: GameState): GameState {
 }
 
 export function showScoreboard(game: GameState): GameState {
+  const now = Date.now();
+
   return {
     ...game,
-    status: "scoreboard"
+    status: "scoreboard",
+    scoreboardStartedAt: new Date(now).toISOString(),
+    nextRoundStartsAt: new Date(now + SCOREBOARD_COUNTDOWN_SECONDS * 1000).toISOString(),
+    readyPlayerIds: []
   };
 }
 
@@ -190,18 +199,23 @@ export function advanceRound(game: GameState): GameState {
   if (nextRound >= game.rounds.length) {
     return {
       ...game,
-      status: "finished"
+      status: "finished",
+      scoreboardStartedAt: undefined,
+      nextRoundStartsAt: undefined,
+      readyPlayerIds: []
     };
   }
 
-  return {
+  return startRound({
     ...game,
-    status: "lobby",
     currentRoundIndex: nextRound,
     revealStep: 0,
     roundStartedAt: undefined,
-    roundEndsAt: undefined
-  };
+    roundEndsAt: undefined,
+    scoreboardStartedAt: undefined,
+    nextRoundStartsAt: undefined,
+    readyPlayerIds: []
+  });
 }
 
 export function getRoundGuesses(game: GameState) {
@@ -212,6 +226,30 @@ export function sortGuessesForReveal(game: GameState) {
   return getRoundGuesses(game)
     .filter((guess) => guess.distanceKm !== undefined)
     .sort((a, b) => (b.distanceKm ?? 0) - (a.distanceKm ?? 0));
+}
+
+export function markPlayerReady(game: GameState, playerId: string): GameState {
+  if (game.status !== "scoreboard") return game;
+  if (!game.players.some((player) => player.id === playerId)) return game;
+
+  const readyPlayerIds = game.readyPlayerIds ?? [];
+  if (readyPlayerIds.includes(playerId)) return game;
+
+  return {
+    ...game,
+    readyPlayerIds: [...readyPlayerIds, playerId]
+  };
+}
+
+export function getReadyPlayerCount(game: GameState) {
+  const playerIds = new Set(game.players.map((player) => player.id));
+  return (game.readyPlayerIds ?? []).filter((playerId) => playerIds.has(playerId)).length;
+}
+
+export function allPlayersReady(game: GameState): boolean {
+  if (game.players.length === 0) return false;
+  const readyPlayerIds = new Set(game.readyPlayerIds ?? []);
+  return game.players.every((player) => readyPlayerIds.has(player.id));
 }
 
 export function rankedPlayers(game: GameState) {

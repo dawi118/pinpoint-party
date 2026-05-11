@@ -53,7 +53,10 @@ export type GameState = {
   currentRoundIndex: number;
   roundStartedAt?: string;
   roundEndsAt?: string;
+  scoreboardStartedAt?: string;
+  nextRoundStartsAt?: string;
   revealStep: number;
+  readyPlayerIds?: string[];
   players: Player[];
   rounds: MediaRound[];
   guessesByRound: Record<number, Guess[]>;
