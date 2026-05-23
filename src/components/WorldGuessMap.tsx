@@ -1,4 +1,4 @@
-import { Crosshair, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import maplibregl from "maplibre-gl";
 import { useEffect, useRef } from "react";
 import { Coordinates } from "../lib/geo";
@@ -45,10 +45,24 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
     map.touchZoomRotate.enable();
     map.touchZoomRotate.disableRotation();
+    map.scrollZoom.enable();
+    map.doubleClickZoom.enable();
+    map.boxZoom.enable();
+
+    const resizeMap = () => map.resize();
+    const resizeObserver = "ResizeObserver" in window ? new ResizeObserver(resizeMap) : undefined;
+    resizeObserver?.observe(containerRef.current);
 
     if (hidePlaceLabels) {
+      map.on("load", () => hideTextLabels(map));
       map.on("styledata", () => hideTextLabels(map));
     }
+
+    map.on("load", resizeMap);
+    window.addEventListener("resize", resizeMap);
+    window.visualViewport?.addEventListener("resize", resizeMap);
+    requestAnimationFrame(resizeMap);
+    window.setTimeout(resizeMap, 250);
 
     map.on("click", (event) => {
       if (disabledRef.current || !onChangeRef.current) return;
@@ -58,6 +72,9 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
     mapRef.current = map;
 
     return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", resizeMap);
+      window.visualViewport?.removeEventListener("resize", resizeMap);
       markersRef.current.forEach((marker) => marker.remove());
       markersRef.current = [];
       map.remove();
@@ -68,6 +85,7 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+    map.resize();
 
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
@@ -140,7 +158,6 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
       <div ref={containerRef} className={`world-map real-world-map ${disabled ? "is-locked" : ""}`}>
         {!disabled && !value && (
           <div className="map-empty">
-            <Crosshair size={26} />
             <span>Tap the map or pinch to explore</span>
           </div>
         )}

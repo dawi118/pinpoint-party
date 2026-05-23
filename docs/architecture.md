@@ -22,8 +22,8 @@ The current app uses `localStorage` plus `BroadcastChannel` so multiple tabs can
 ## Game Modes
 
 - Pinpointer is the introductory landmark-photo mode: players place one pin and closest wins.
-- Earth Classic uses street-seeded rounds with a movable MapLibre view plus the same guess map, confirmation, reveal, and scoring flow.
-- Pin Central is present in the menu as a disabled placeholder for the future average-location challenge.
+- PinPoint Central uses four landmark photos per round and calculates the geographic centre as the scoring target.
+- HeliView uses city-map rounds with buildings, hidden labels, and the same guess map, confirmation, reveal, and scoring flow.
 
 ## Backend Path
 

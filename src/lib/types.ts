@@ -1,5 +1,5 @@
 export type GameStatus = "lobby" | "round_active" | "revealing" | "scoreboard" | "finished";
-export type GameMode = "pinpointer" | "earth_classic";
+export type GameMode = "pinpointer" | "pin_central" | "heliview" | "earth_classic";
 
 export type StreetViewSeed = {
   startLat: number;
@@ -20,6 +20,16 @@ export type MediaRound = {
   difficulty: "easy" | "medium" | "hard";
   attribution: string;
   streetView?: StreetViewSeed;
+  centralImages?: CentralImage[];
+};
+
+export type CentralImage = {
+  id: string;
+  url: string;
+  lat: number;
+  lng: number;
+  label: string;
+  attribution: string;
 };
 
 export type Player = {

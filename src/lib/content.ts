@@ -191,6 +191,111 @@ export const PINPOINTER_CONTENT_BANK: MediaRound[] = [
   }
 ];
 
+const PIN_CENTRAL_PHOTOS = [
+  {
+    id: "central-eiffel-tower",
+    url: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+    lat: 48.8584,
+    lng: 2.2945,
+    label: "Eiffel Tower, Paris",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "central-tower-bridge",
+    url: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+    lat: 51.5055,
+    lng: -0.0754,
+    label: "Tower Bridge, London",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "central-colosseum",
+    url: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80",
+    lat: 41.8902,
+    lng: 12.4922,
+    label: "Colosseum, Rome",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "central-sagrada-familia",
+    url: "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1200&q=80",
+    lat: 41.4036,
+    lng: 2.1744,
+    label: "Sagrada Familia, Barcelona",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "central-statue-liberty",
+    url: "https://images.unsplash.com/photo-1605130284535-11dd9eedc58a?auto=format&fit=crop&w=1200&q=80",
+    lat: 40.6892,
+    lng: -74.0445,
+    label: "Statue of Liberty, New York",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "central-christ-redeemer",
+    url: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=1200&q=80",
+    lat: -22.9519,
+    lng: -43.2105,
+    label: "Christ the Redeemer, Rio de Janeiro",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "central-sydney-opera-house",
+    url: "https://images.unsplash.com/photo-1523428096881-5bd79d043006?auto=format&fit=crop&w=1200&q=80",
+    lat: -33.8568,
+    lng: 151.2153,
+    label: "Sydney Opera House",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "central-burj-khalifa",
+    url: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80",
+    lat: 25.1972,
+    lng: 55.2744,
+    label: "Burj Khalifa, Dubai",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "central-taj-mahal",
+    url: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80",
+    lat: 27.1751,
+    lng: 78.0421,
+    label: "Taj Mahal, Agra",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "central-angkor-wat",
+    url: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1200&q=80",
+    lat: 13.4125,
+    lng: 103.867,
+    label: "Angkor Wat, Cambodia",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "central-mount-fuji",
+    url: "https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=1200&q=80",
+    lat: 35.3606,
+    lng: 138.7274,
+    label: "Mount Fuji, Japan",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "central-machu-picchu",
+    url: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?auto=format&fit=crop&w=1200&q=80",
+    lat: -13.1631,
+    lng: -72.545,
+    label: "Machu Picchu, Peru",
+    attribution: "Photo via Unsplash"
+  }
+];
+
+export const PIN_CENTRAL_CONTENT_BANK: MediaRound[] = [
+  buildPinCentralRound("pin-central-europe-icons", "European Icons", PIN_CENTRAL_PHOTOS.slice(0, 4), "easy"),
+  buildPinCentralRound("pin-central-global-south", "Global South", PIN_CENTRAL_PHOTOS.slice(4, 8), "medium"),
+  buildPinCentralRound("pin-central-asia-pacific", "Asia-Pacific", PIN_CENTRAL_PHOTOS.slice(8, 12), "hard")
+];
+
 export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
   {
     id: "earth-classic-manhattan",
@@ -355,9 +460,70 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
 ];
 
 export function pickRounds(count: 3 | 5 | 10, mode: GameMode = "pinpointer"): MediaRound[] {
-  const bank = mode === "earth_classic" ? EARTH_CLASSIC_CONTENT_BANK : PINPOINTER_CONTENT_BANK;
+  const bank = getContentBank(mode);
   const needed = Math.min(count, bank.length);
   return shuffle(bank).slice(0, needed);
+}
+
+function getContentBank(mode: GameMode) {
+  if (mode === "pin_central") return PIN_CENTRAL_CONTENT_BANK;
+  if (mode === "earth_classic" || mode === "heliview") return EARTH_CLASSIC_CONTENT_BANK;
+  return PINPOINTER_CONTENT_BANK;
+}
+
+function buildPinCentralRound(
+  id: string,
+  locationLabel: string,
+  centralImages: typeof PIN_CENTRAL_PHOTOS,
+  difficulty: MediaRound["difficulty"]
+): MediaRound {
+  const center = getGeographicCenter(centralImages);
+
+  return {
+    id,
+    type: "image",
+    actualLat: center.lat,
+    actualLng: center.lng,
+    locationLabel,
+    contentPack: "PinPoint Central",
+    difficulty,
+    attribution: "Photos via Unsplash",
+    centralImages
+  };
+}
+
+function getGeographicCenter(points: Array<{ lat: number; lng: number }>) {
+  const vector = points.reduce(
+    (total, point) => {
+      const lat = toRadians(point.lat);
+      const lng = toRadians(point.lng);
+
+      return {
+        x: total.x + Math.cos(lat) * Math.cos(lng),
+        y: total.y + Math.cos(lat) * Math.sin(lng),
+        z: total.z + Math.sin(lat)
+      };
+    },
+    { x: 0, y: 0, z: 0 }
+  );
+  const count = Math.max(points.length, 1);
+  const x = vector.x / count;
+  const y = vector.y / count;
+  const z = vector.z / count;
+  const hyp = Math.sqrt(x * x + y * y);
+
+  return {
+    lat: toDegrees(Math.atan2(z, hyp)),
+    lng: toDegrees(Math.atan2(y, x))
+  };
+}
+
+function toRadians(value: number) {
+  return (value * Math.PI) / 180;
+}
+
+function toDegrees(value: number) {
+  return (value * 180) / Math.PI;
 }
 
 function shuffle(rounds: MediaRound[]): MediaRound[] {

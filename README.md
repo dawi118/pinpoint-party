@@ -7,13 +7,13 @@ This repo implements the first playable web prototype based on the supplied game
 ## What Works Now
 
 - Host can create a room with 3, 5, or 10 rounds.
-- Host can choose Pinpointer or Earth Classic from the game menu.
-- Pin Central appears as a disabled placeholder for the future central-point mode.
+- Host can choose Pinpointer, PinPoint Central, or HeliView from the game menu.
 - Players can join with a four-character room code.
 - Up to 8 players are supported.
 - Host sees lobby, round clue, confirmation status, reveal, scoreboard, and final state.
 - Player phones can place and confirm pins on a responsive world map.
-- Earth Classic rounds add a street-style exploration view that players can move through before switching back to the same guess map.
+- PinPoint Central rounds show four landmark photos and score guesses against the generated centre point.
+- HeliView rounds add a scrollable city map with buildings before switching back to the same guess map.
 - Guessing uses MapLibre GL JS with an OpenFreeMap street-map style, including pinch and wheel zoom.
 - The player guessing map hides place and POI labels so map text cannot give away the answer.
 - Rounds end when all players confirm or the timer expires.

@@ -28,7 +28,7 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
   const player = useMemo(() => game?.players.find((item) => item.id === playerId), [game, playerId]);
 
   useEffect(() => {
-    if (game?.status === "round_active" && (game.mode ?? "pinpointer") === "earth_classic") {
+    if (game?.status === "round_active" && isHeliViewMode(game.mode ?? "pinpointer")) {
       setClassicView("street");
     }
   }, [game?.currentRoundIndex, game?.mode, game?.status]);
@@ -61,7 +61,7 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
   if (game.status === "round_active") {
     const mode = game.mode ?? "pinpointer";
 
-    if (mode === "earth_classic") {
+    if (isHeliViewMode(mode)) {
       return (
         <main className="app player-game earth-classic-player">
           <header className="phone-top">
@@ -71,7 +71,7 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
             </div>
             <span><Clock size={16} /> {Math.floor(remainingSeconds / 60)}:{String(remainingSeconds % 60).padStart(2, "0")}</span>
           </header>
-          <section className="classic-view-tabs" aria-label="Earth Classic view">
+          <section className="classic-view-tabs" aria-label="HeliView view">
             <button className={classicView === "street" ? "selected" : ""} type="button" onClick={() => setClassicView("street")}>
               <Route size={17} /> Explore
             </button>
@@ -92,7 +92,7 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
           </section>
           <section className="confirm-dock">
             <div>
-              <span className="kicker">Earth Classic / Round {game.currentRoundIndex + 1}</span>
+              <span className="kicker">HeliView / Round {game.currentRoundIndex + 1}</span>
               <strong>{guess?.confirmed ? "Guess confirmed" : "Explore, then pin it"}</strong>
             </div>
             <button
@@ -124,8 +124,8 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
         />
         <section className="confirm-dock">
           <div>
-            <span className="kicker">Round {game.currentRoundIndex + 1}</span>
-            <strong>{guess?.confirmed ? "Guess confirmed" : "Place your pin"}</strong>
+            <span className="kicker">{mode === "pin_central" ? "PinPoint Central" : "Round"} {game.currentRoundIndex + 1}</span>
+            <strong>{guess?.confirmed ? "Guess confirmed" : mode === "pin_central" ? "Place the centre point" : "Place your pin"}</strong>
           </div>
           <button
             className="primary-action"
@@ -188,6 +188,10 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
       </section>
     </main>
   );
+}
+
+function isHeliViewMode(mode: GameState["mode"]) {
+  return mode === "heliview" || mode === "earth_classic";
 }
 
 function PlayerResult({ guess, locationLabel }: { guess?: Guess; locationLabel: string }) {

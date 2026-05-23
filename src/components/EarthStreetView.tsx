@@ -1,4 +1,4 @@
-import { Compass, LocateFixed } from "lucide-react";
+import { Compass } from "lucide-react";
 import maplibregl from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
 import { MediaRound } from "../lib/types";
@@ -38,23 +38,33 @@ export function EarthStreetView({ round }: { round: MediaRound }) {
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
     map.touchZoomRotate.enable();
     map.touchZoomRotate.disableRotation();
+    map.scrollZoom.enable();
+    map.doubleClickZoom.enable();
+    map.boxZoom.enable();
     map.on("styledata", () => hideTextLabels(map));
-    map.on("click", (event) => {
-      const center = map.getCenter();
-      const nextBearing = getBearing(center.lat, center.lng, event.lngLat.lat, event.lngLat.lng);
-      setBearing(nextBearing);
-      map.easeTo({
-        center: event.lngLat,
-        bearing: nextBearing,
-        pitch: 67,
-        zoom: Math.max(map.getZoom(), seed.zoom),
-        duration: 650
-      });
+    map.on("load", () => {
+      hideTextLabels(map);
+      addBuildingExtrusions(map);
+      map.resize();
     });
+    map.on("rotate", () => {
+      setBearing(map.getBearing());
+    });
+
+    const resizeMap = () => map.resize();
+    const resizeObserver = "ResizeObserver" in window ? new ResizeObserver(resizeMap) : undefined;
+    resizeObserver?.observe(containerRef.current);
+    window.addEventListener("resize", resizeMap);
+    window.visualViewport?.addEventListener("resize", resizeMap);
+    requestAnimationFrame(resizeMap);
+    window.setTimeout(resizeMap, 250);
 
     mapRef.current = map;
 
     return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", resizeMap);
+      window.visualViewport?.removeEventListener("resize", resizeMap);
       map.remove();
       mapRef.current = null;
     };
@@ -63,9 +73,6 @@ export function EarthStreetView({ round }: { round: MediaRound }) {
   return (
     <div className="earth-street-view">
       <div ref={containerRef} className="earth-street-map" />
-      <div className="street-reticle" aria-hidden="true">
-        <LocateFixed size={24} />
-      </div>
       <div className="street-compass" aria-label={`Bearing ${Math.round(bearing)} degrees`}>
         <Compass size={18} style={{ transform: `rotate(${bearing}deg)` }} />
       </div>
@@ -73,19 +80,32 @@ export function EarthStreetView({ round }: { round: MediaRound }) {
   );
 }
 
-function getBearing(fromLat: number, fromLng: number, toLat: number, toLng: number) {
-  const fromLatRad = toRadians(fromLat);
-  const toLatRad = toRadians(toLat);
-  const deltaLng = toRadians(toLng - fromLng);
-  const y = Math.sin(deltaLng) * Math.cos(toLatRad);
-  const x = Math.cos(fromLatRad) * Math.sin(toLatRad) - Math.sin(fromLatRad) * Math.cos(toLatRad) * Math.cos(deltaLng);
-  return (toDegrees(Math.atan2(y, x)) + 360) % 360;
-}
+function addBuildingExtrusions(map: maplibregl.Map) {
+  if (map.getLayer("pinpoint-3d-buildings")) return;
+  const style = map.getStyle();
+  const sourceName = Object.keys(style.sources ?? {}).find((name) => name === "openmaptiles" || name === "openfreemap" || name === "protomaps");
+  if (!sourceName) return;
 
-function toRadians(value: number) {
-  return (value * Math.PI) / 180;
-}
+  const firstSymbolLayer = style.layers?.find((layer) => layer.type === "symbol")?.id;
 
-function toDegrees(value: number) {
-  return (value * 180) / Math.PI;
+  try {
+    map.addLayer(
+      {
+        id: "pinpoint-3d-buildings",
+        source: sourceName,
+        "source-layer": "building",
+        type: "fill-extrusion",
+        minzoom: 14,
+        paint: {
+          "fill-extrusion-color": "#6d7f91",
+          "fill-extrusion-height": ["coalesce", ["get", "render_height"], ["get", "height"], 18],
+          "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], ["get", "min_height"], 0],
+          "fill-extrusion-opacity": 0.72
+        }
+      },
+      firstSymbolLayer
+    );
+  } catch {
+    // Some tile styles do not expose a compatible building layer.
+  }
 }

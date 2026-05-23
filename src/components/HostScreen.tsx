@@ -28,7 +28,7 @@ const SCENIC_IMAGES = [
   "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=900&q=80",
   "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80",
   "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=900&q=80"
+  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80"
 ];
 
 export function HostScreen({ roomCode }: { roomCode?: string }) {
@@ -306,14 +306,16 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
 
       {game.status === "round_active" && (
         <section className="round-stage">
-          {(game.mode ?? "pinpointer") === "earth_classic" ? (
+          {(game.mode ?? "pinpointer") === "pin_central" ? (
+            <CentralPhotoGrid game={game} />
+          ) : isHeliViewMode(game.mode ?? "pinpointer") ? (
             <EarthStreetView round={round} />
           ) : (
             <img src={round.url} alt="Round clue" />
           )}
           <div className="round-overlay">
             <span className="kicker">{round.contentPack}</span>
-            <h1>{(game.mode ?? "pinpointer") === "earth_classic" ? "Explore the street map, then pinpoint it" : "Where was this taken?"}</h1>
+            <h1>{getRoundPrompt(game.mode ?? "pinpointer")}</h1>
             <p>{confirmedCount} of {game.players.length} players locked in</p>
           </div>
           <PlayerList game={game} />
@@ -424,18 +426,18 @@ function ModeMenu({ value, onChange }: { value: GameMode; onChange: (mode: GameM
           <small>Famous landmarks, closest wins</small>
         </span>
       </button>
-      <button type="button" className={value === "earth_classic" ? "selected" : ""} onClick={() => onChange("earth_classic")}>
-        <Route size={18} />
-        <span>
-          <strong>Earth Classic</strong>
-          <small>Street-map exploration plus map guesses</small>
-        </span>
-      </button>
-      <button type="button" disabled>
+      <button type="button" className={value === "pin_central" ? "selected" : ""} onClick={() => onChange("pin_central")}>
         <Globe2 size={18} />
         <span>
-          <strong>Pin Central</strong>
-          <small>Several places, one central point</small>
+          <strong>PinPoint Central</strong>
+          <small>Four clues, find the centre</small>
+        </span>
+      </button>
+      <button type="button" className={isHeliViewMode(value) ? "selected" : ""} onClick={() => onChange("heliview")}>
+        <Route size={18} />
+        <span>
+          <strong>HeliView</strong>
+          <small>Scroll city maps with buildings</small>
         </span>
       </button>
     </fieldset>
@@ -443,7 +445,35 @@ function ModeMenu({ value, onChange }: { value: GameMode; onChange: (mode: GameM
 }
 
 function getModeLabel(mode: GameMode) {
-  return mode === "earth_classic" ? "Earth Classic" : "Pinpointer";
+  if (mode === "pin_central") return "PinPoint Central";
+  if (isHeliViewMode(mode)) return "HeliView";
+  return "Pinpointer";
+}
+
+function getRoundPrompt(mode: GameMode) {
+  if (mode === "pin_central") return "Where is the centre of these four places?";
+  if (isHeliViewMode(mode)) return "Explore the city map, then pinpoint it";
+  return "Where was this taken?";
+}
+
+function isHeliViewMode(mode: GameMode) {
+  return mode === "heliview" || mode === "earth_classic";
+}
+
+function CentralPhotoGrid({ game }: { game: GameState }) {
+  const round = game.rounds[game.currentRoundIndex];
+  const images = round.centralImages ?? [];
+
+  return (
+    <div className="central-photo-grid">
+      {images.map((image) => (
+        <figure key={image.id}>
+          <img src={image.url} alt={image.label} loading="eager" />
+          <figcaption>{image.label}</figcaption>
+        </figure>
+      ))}
+    </div>
+  );
 }
 
 function PlayerList({ game }: { game: GameState }) {

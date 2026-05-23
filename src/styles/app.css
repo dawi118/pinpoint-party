@@ -403,6 +403,11 @@ select {
   border-radius: 0;
 }
 
+.round-stage > .central-photo-grid {
+  position: absolute;
+  inset: 0;
+}
+
 .round-stage .earth-street-map {
   height: 100%;
   min-height: 100%;
@@ -413,6 +418,48 @@ select {
   position: absolute;
   inset: 0;
   background: linear-gradient(90deg, rgba(5, 8, 14, 0.88), rgba(5, 8, 14, 0.22), rgba(5, 8, 14, 0.65));
+}
+
+.central-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  background: #060a12;
+  padding: 0.45rem;
+}
+
+.central-photo-grid figure {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #111827;
+}
+
+.central-photo-grid img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.central-photo-grid figcaption {
+  position: absolute;
+  left: 0.65rem;
+  right: 0.65rem;
+  bottom: 0.65rem;
+  z-index: 1;
+  width: fit-content;
+  max-width: calc(100% - 1.3rem);
+  border-radius: 999px;
+  background: rgba(7, 11, 19, 0.82);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 900;
+  padding: 0.28rem 0.58rem;
 }
 
 .round-overlay {
@@ -562,23 +609,11 @@ select {
 .earth-street-map {
   width: 100%;
   min-height: min(70vh, 680px);
-  cursor: pointer;
+  cursor: grab;
 }
 
-.street-reticle {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 2;
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 999px;
-  background: rgba(7, 11, 19, 0.5);
-  color: #f6c85f;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
+.earth-street-map:active {
+  cursor: grabbing;
 }
 
 .street-compass {
@@ -795,6 +830,9 @@ select {
   display: grid;
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
+  min-height: 100svh;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .earth-classic-player {
@@ -832,8 +870,14 @@ select {
   min-height: 0;
 }
 
+.map-shell,
+.classic-play-surface {
+  min-width: 0;
+}
+
 .player-game .world-map {
-  min-height: calc(100vh - 170px);
+  height: calc(100svh - 170px);
+  min-height: 280px;
   border-radius: 0;
   border-left: 0;
   border-right: 0;
@@ -842,7 +886,8 @@ select {
 .earth-classic-player .world-map,
 .earth-classic-player .earth-street-view,
 .earth-classic-player .earth-street-map {
-  min-height: calc(100vh - 218px);
+  height: calc(100svh - 218px);
+  min-height: 260px;
   border-left: 0;
   border-right: 0;
   border-radius: 0;
@@ -855,12 +900,16 @@ select {
 }
 
 .confirm-dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.9rem;
+  padding: 0.9rem 0.9rem calc(0.9rem + max(env(safe-area-inset-bottom), 12px));
   background: rgba(7, 11, 19, 0.94);
+  box-shadow: 0 -18px 42px rgba(0, 0, 0, 0.28);
 }
 
 .confirm-dock strong {
