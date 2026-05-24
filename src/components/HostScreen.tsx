@@ -1,4 +1,4 @@
-import { ArrowRight, Clock, Copy, Crosshair, Eye, Globe2, Home, MapPinned, Play, Route, Trophy, Users } from "lucide-react";
+import { ArrowRight, Clock, Copy, Crosshair, Eye, Home, MapPinned, Play, Route, Trophy, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import {
@@ -401,13 +401,6 @@ function ModeMenu({ value, onChange }: { value: GameMode; onChange: (mode: GameM
           <small>Four clues, find the centre</small>
         </span>
       </button>
-      <button type="button" className={value === "earth_classic" ? "selected" : ""} onClick={() => onChange("earth_classic")}>
-        <Globe2 size={18} />
-        <span>
-          <strong>PinPoint Classic</strong>
-          <small>Explore the map, closest wins</small>
-        </span>
-      </button>
       <button type="button" className={value === "heliview" ? "selected" : ""} onClick={() => onChange("heliview")}>
         <Route size={18} />
         <span>
@@ -418,7 +411,7 @@ function ModeMenu({ value, onChange }: { value: GameMode; onChange: (mode: GameM
       <button type="button" className={value === "geoguessr_classic" ? "selected" : ""} onClick={() => onChange("geoguessr_classic")}>
         <Eye size={18} />
         <span>
-          <strong>GeoGuessr Classic</strong>
+          <strong>PinPoint Classic</strong>
           <small>Explore the streets</small>
         </span>
       </button>
@@ -430,7 +423,7 @@ function getModeLabel(mode: GameMode) {
   if (mode === "pin_central") return "PinPoint Central";
   if (mode === "earth_classic") return "PinPoint Classic";
   if (mode === "heliview") return "HeliView";
-  if (mode === "geoguessr_classic") return "GeoGuessr Classic";
+  if (mode === "geoguessr_classic") return "PinPoint Classic";
   return "PinPoint Places";
 }
 

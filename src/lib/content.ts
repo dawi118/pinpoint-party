@@ -898,7 +898,7 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
 export const GEOGUESSR_CLASSIC_CONTENT_BANK: MediaRound[] = EARTH_CLASSIC_CONTENT_BANK.map((round) => ({
   ...round,
   id: round.id.replace("earth-classic", "geoguessr-classic"),
-  contentPack: "GeoGuessr Classic",
+  contentPack: "PinPoint Classic",
   attribution: "Street panorama"
 }));
 

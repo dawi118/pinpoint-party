@@ -7,13 +7,13 @@ This repo implements the first playable web prototype based on the supplied game
 ## What Works Now
 
 - Host can create a room from the main menu, then tune game mode, timer, and round count in the lobby.
-- Host can choose PinPoint Places, PinPoint Central, PinPoint Classic, HeliView, or GeoGuessr Classic from the lobby.
+- Host can choose PinPoint Places, PinPoint Central, HeliView, or PinPoint Classic from the lobby.
 - Players can join with a four-character room code.
 - Up to 8 players are supported.
 - Host sees lobby, round clue, confirmation status, reveal, scoreboard, and final state.
 - Player phones can place and confirm pins on a responsive world map.
 - HeliView rounds use aerial-style city exploration before players switch back to the same guess map.
-- GeoGuessr Classic rounds let players explore the streets, place a pin, and use the same proximity reveal as PinPoint Places.
+- PinPoint Classic rounds let players explore the streets, place a pin, and use the same proximity reveal as PinPoint Places.
 - PinPoint Central rounds show four image clues from different places and score guesses against the calculated map-space average location.
 - Guessing uses MapLibre GL JS with an OpenFreeMap street-map style, including pinch and wheel zoom.
 - The player guessing map hides place and POI labels so map text cannot give away the answer.
@@ -84,7 +84,7 @@ VITE_PUBLIC_ORIGIN=https://your-game.example.com
 
 The host screen uses that value when showing the phone join link.
 
-GeoGuessr Classic uses the controllable panorama view so address cards and road labels can be hidden during play. Configure a browser-restricted Maps key locally:
+PinPoint Classic uses the controllable panorama view so address cards and road labels can be hidden during play. Configure a browser-restricted Maps key locally:
 
 ```text
 VITE_GOOGLE_MAPS_API_KEY=your-maps-key

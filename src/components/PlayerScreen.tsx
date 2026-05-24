@@ -278,7 +278,7 @@ function isExploreMode(mode: GameState["mode"]) {
 
 function getModeLabel(mode: GameState["mode"]) {
   if (mode === "pin_central") return "PinPoint Central";
-  if (mode === "geoguessr_classic") return "GeoGuessr Classic";
+  if (mode === "geoguessr_classic") return "PinPoint Classic";
   if (mode === "earth_classic") return "PinPoint Classic";
   if (mode === "heliview") return "HeliView";
   return "PinPoint Places";
