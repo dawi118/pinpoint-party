@@ -1,23 +1,36 @@
-import { Check, Clock, MapPinned, Route, Trophy } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { confirmGuess, getRoundGuesses, markPlayerReady, upsertGuess } from "../lib/gameState";
+import { Check, Clock, Eye, MapPinned, Route, Trophy } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { confirmGuess, getRoundGuesses, logStreetMovement, markPlayerReady, upsertGuess } from "../lib/gameState";
 import { formatDistance } from "../lib/geo";
 import { fetchGame, loadGame, saveGame, subscribeToGame } from "../lib/localGameStore";
-import { GameState, Guess } from "../lib/types";
+import { GameState, Guess, StreetMovementPoint } from "../lib/types";
+import { AppLogo } from "./AppLogo";
 import { EarthStreetView } from "./EarthStreetView";
+import { GoogleStreetView } from "./GoogleStreetView";
 import { Scoreboard } from "./Scoreboard";
 import { WorldGuessMap } from "./WorldGuessMap";
 
 export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerId?: string }) {
   const [game, setGame] = useState<GameState | undefined>(() => loadGame(roomCode));
+  const gameRef = useRef<GameState | undefined>(game);
   const [now, setNow] = useState(Date.now());
   const [classicView, setClassicView] = useState<"street" | "map">("street");
 
-  useEffect(() => subscribeToGame(roomCode, setGame), [roomCode]);
+  useEffect(() => {
+    gameRef.current = game;
+  }, [game]);
+
+  useEffect(() => subscribeToGame(roomCode, (nextGame) => {
+    gameRef.current = nextGame;
+    setGame(nextGame);
+  }), [roomCode]);
   useEffect(() => {
     if (game) return;
     void fetchGame(roomCode).then((remoteGame) => {
-      if (remoteGame) setGame(remoteGame);
+      if (remoteGame) {
+        gameRef.current = remoteGame;
+        setGame(remoteGame);
+      }
     });
   }, [game, roomCode]);
   useEffect(() => {
@@ -28,7 +41,7 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
   const player = useMemo(() => game?.players.find((item) => item.id === playerId), [game, playerId]);
 
   useEffect(() => {
-    if (game?.status === "round_active" && (game.mode ?? "pinpointer") === "earth_classic") {
+    if (game?.status === "round_active" && isStreetMode(game.mode ?? "pinpointer")) {
       setClassicView("street");
     }
   }, [game?.currentRoundIndex, game?.mode, game?.status]);
@@ -36,6 +49,7 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
   if (!game || !player) {
     return (
       <main className="app phone-shell">
+        <AppLogo />
         <section className="phone-panel">
           <span className="kicker">Room {roomCode}</span>
           <h1>Join required</h1>
@@ -54,16 +68,26 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
     : game.timerSeconds;
 
   const persist = (next: GameState) => {
+    gameRef.current = next;
     setGame(next);
     saveGame(next);
+  };
+
+  const persistUpdate = (updater: (current: GameState) => GameState) => {
+    const current = gameRef.current;
+    if (!current) return;
+
+    persist(updater(current));
   };
 
   if (game.status === "round_active") {
     const mode = game.mode ?? "pinpointer";
 
-    if (mode === "earth_classic") {
+    if (isStreetMode(mode)) {
+      const isGeoGuessrClassic = mode === "geoguessr_classic";
       return (
         <main className="app player-game earth-classic-player">
+          <AppLogo />
           <header className="phone-top">
             <div>
               <span className="player-dot" style={{ background: player.color }} />
@@ -71,9 +95,9 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
             </div>
             <span><Clock size={16} /> {Math.floor(remainingSeconds / 60)}:{String(remainingSeconds % 60).padStart(2, "0")}</span>
           </header>
-          <section className="classic-view-tabs" aria-label="Earth Classic view">
+          <section className="classic-view-tabs" aria-label={`${getModeLabel(mode)} view`}>
             <button className={classicView === "street" ? "selected" : ""} type="button" onClick={() => setClassicView("street")}>
-              <Route size={17} /> Explore
+              {isGeoGuessrClassic ? <Route size={17} /> : <Eye size={17} />} Explore
             </button>
             <button className={classicView === "map" ? "selected" : ""} type="button" onClick={() => setClassicView("map")}>
               <MapPinned size={17} /> Map
@@ -81,25 +105,32 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
           </section>
           <section className="classic-play-surface">
             {classicView === "street" ? (
-              <EarthStreetView round={round} />
+              isGeoGuessrClassic ? (
+                <GoogleStreetView
+                  round={round}
+                  onMovement={(point: StreetMovementPoint) => persistUpdate((current) => logStreetMovement(current, player.id, point))}
+                />
+              ) : (
+                <EarthStreetView round={round} />
+              )
             ) : (
               <WorldGuessMap
                 value={guess ? { lat: guess.lat, lng: guess.lng } : undefined}
                 disabled={guess?.confirmed}
-                onChange={(position) => persist(upsertGuess(game, player.id, position.lat, position.lng))}
+                onChange={(position) => persistUpdate((current) => upsertGuess(current, player.id, position.lat, position.lng))}
               />
             )}
           </section>
           <section className="confirm-dock">
             <div>
-              <span className="kicker">Earth Classic / Round {game.currentRoundIndex + 1}</span>
-              <strong>{guess?.confirmed ? "Guess confirmed" : "Explore, then pin it"}</strong>
+              <span className="kicker">{getModeLabel(mode)} / Round {game.currentRoundIndex + 1}</span>
+              <strong>{guess?.confirmed ? "Guess confirmed" : getStreetModeInstruction(mode)}</strong>
             </div>
             <button
               className="primary-action"
               type="button"
               disabled={!guess || guess.confirmed}
-              onClick={() => persist(confirmGuess(game, player.id))}
+              onClick={() => persistUpdate((current) => confirmGuess(current, player.id))}
             >
               <Check size={18} /> Confirm
             </button>
@@ -110,6 +141,7 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
 
     return (
       <main className="app player-game">
+        <AppLogo />
         <header className="phone-top">
           <div>
             <span className="player-dot" style={{ background: player.color }} />
@@ -120,18 +152,18 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
         <WorldGuessMap
           value={guess ? { lat: guess.lat, lng: guess.lng } : undefined}
           disabled={guess?.confirmed}
-          onChange={(position) => persist(upsertGuess(game, player.id, position.lat, position.lng))}
+          onChange={(position) => persistUpdate((current) => upsertGuess(current, player.id, position.lat, position.lng))}
         />
         <section className="confirm-dock">
           <div>
-            <span className="kicker">Round {game.currentRoundIndex + 1}</span>
-            <strong>{guess?.confirmed ? "Guess confirmed" : "Place your pin"}</strong>
+            <span className="kicker">{getModeLabel(mode)} / Round {game.currentRoundIndex + 1}</span>
+            <strong>{guess?.confirmed ? "Guess confirmed" : getMapModeInstruction(mode)}</strong>
           </div>
           <button
             className="primary-action"
             type="button"
             disabled={!guess || guess.confirmed}
-            onClick={() => persist(confirmGuess(game, player.id))}
+            onClick={() => persistUpdate((current) => confirmGuess(current, player.id))}
           >
             <Check size={18} /> Confirm
           </button>
@@ -146,6 +178,7 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
 
   return (
     <main className="app phone-shell">
+      <AppLogo />
       <section className="phone-panel">
         <span className="kicker">Room {game.roomCode}</span>
         {game.status === "lobby" && (
@@ -171,7 +204,7 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
                 className="primary-action"
                 type="button"
                 disabled={isReady}
-                onClick={() => persist(markPlayerReady(game, player.id))}
+                onClick={() => persistUpdate((current) => markPlayerReady(current, player.id))}
               >
                 <Check size={18} /> {isReady ? "Ready" : "Ready for next round"}
               </button>
@@ -188,6 +221,25 @@ export function PlayerScreen({ roomCode, playerId }: { roomCode: string; playerI
       </section>
     </main>
   );
+}
+
+function isStreetMode(mode: GameState["mode"]) {
+  return mode === "earth_classic" || mode === "geoguessr_classic";
+}
+
+function getModeLabel(mode: GameState["mode"]) {
+  if (mode === "pin_central") return "PinPoint Central";
+  if (mode === "geoguessr_classic") return "GeoGuessr Classic";
+  if (mode === "earth_classic") return "HeliView";
+  return "PinPoint Places";
+}
+
+function getMapModeInstruction(mode: GameState["mode"]) {
+  return mode === "pin_central" ? "Place your pin at the central location" : "Place your pin";
+}
+
+function getStreetModeInstruction(mode: GameState["mode"]) {
+  return mode === "earth_classic" ? "Study the view, then place your pin" : "Explore, then place your pin";
 }
 
 function PlayerResult({ guess, locationLabel }: { guess?: Guess; locationLabel: string }) {

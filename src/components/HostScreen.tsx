@@ -1,4 +1,4 @@
-import { ArrowRight, Clock, Copy, Globe2, MapPinned, Play, RotateCcw, Route, Trophy, Users } from "lucide-react";
+import { ArrowRight, Clock, Copy, Eye, Focus, Globe2, Home, MapPinned, Play, Trophy, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import {
@@ -6,7 +6,6 @@ import {
   advanceRound,
   allPlayersConfirmed,
   allPlayersReady,
-  createInitialGame,
   finishRound,
   getReadyPlayerCount,
   getRoundGuesses,
@@ -16,8 +15,8 @@ import {
   updateSettings
 } from "../lib/gameState";
 import { fetchGame, fetchRemoteGame, loadGame, saveGame, saveGameAndWait, subscribeToGame } from "../lib/localGameStore";
-import { generateRoomCode } from "../lib/roomCodes";
 import { GameMode, GameState } from "../lib/types";
+import { AppLogo } from "./AppLogo";
 import { EarthStreetView } from "./EarthStreetView";
 import { RevealMap } from "./RevealMap";
 import { Scoreboard } from "./Scoreboard";
@@ -33,9 +32,6 @@ const SCENIC_IMAGES = [
 
 export function HostScreen({ roomCode }: { roomCode?: string }) {
   const [game, setGame] = useState<GameState | undefined>(() => (roomCode ? loadGame(roomCode) : undefined));
-  const [roundCount, setRoundCount] = useState<3 | 5 | 10>(3);
-  const [timerSeconds, setTimerSeconds] = useState(180);
-  const [mode, setMode] = useState<GameMode>("pinpointer");
   const [now, setNow] = useState(Date.now());
   const [mobileOrigin, setMobileOrigin] = useState<string | undefined>();
 
@@ -166,46 +162,15 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
 
   if (!roomCode || !game) {
     return (
-      <main className="app host-create">
-        <section className="host-hero">
-          <ScenicBackdrop />
-          <div>
-            <span className="kicker">TV-led mobile party game</span>
-            <h1>Pinpoint Party</h1>
-            <p>Open a room on the big screen, let players join by code, then watch every guess collapse toward the answer.</p>
-          </div>
-          <form
-            className="setup-panel"
-            onSubmit={async (event) => {
-              event.preventDefault();
-              const next = createInitialGame({ roomCode: generateRoomCode(), roundCount, timerSeconds, mode });
-              const synced = await saveGameAndWait(next);
-              if (!synced) saveGame(next);
-              window.location.href = `/host/${next.roomCode}`;
-            }}
-          >
-            <ModeMenu value={mode} onChange={setMode} />
-            <label>
-              <span>Rounds</span>
-              <select value={roundCount} onChange={(event) => setRoundCount(Number(event.target.value) as 3 | 5 | 10)}>
-                <option value={3}>3 rounds</option>
-                <option value={5}>5 rounds</option>
-                <option value={10}>10 rounds</option>
-              </select>
-            </label>
-            <label>
-              <span>Timer</span>
-              <select value={timerSeconds} onChange={(event) => setTimerSeconds(Number(event.target.value))}>
-                <option value={60}>1 minute</option>
-                <option value={120}>2 minutes</option>
-                <option value={180}>3 minutes</option>
-                <option value={300}>5 minutes</option>
-              </select>
-            </label>
-            <button className="primary-action" type="submit">
-              <Play size={20} /> Create room
-            </button>
-          </form>
+      <main className="app phone-shell">
+        <AppLogo />
+        <section className="phone-panel">
+          <span className="kicker">Host game</span>
+          <h1>Room not found</h1>
+          <p>Return to the main menu to host a fresh PinPoint Party room.</p>
+          <a className="primary-action" href="/">
+            <Home size={18} /> Main menu
+          </a>
         </section>
       </main>
     );
@@ -238,6 +203,7 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
 
   return (
     <main className="app host-display">
+      <AppLogo />
       <header className="top-bar">
         <div>
           <span className="kicker">Room</span>
@@ -257,7 +223,7 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
         <section className="lobby-grid">
           <div className="join-band">
             <ScenicBackdrop />
-            <span className="kicker">Join on your phone</span>
+            <span className="kicker">PinPoint Party lobby</span>
             <h1>{game.roomCode}</h1>
             <JoinQrCode value={joinUrl} />
             <p className="join-url">{joinUrl}</p>
@@ -290,6 +256,8 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
                 value={game.timerSeconds}
                 onChange={(event) => persist(updateSettings(game, game.roundCount, Number(event.target.value), game.mode ?? "pinpointer"))}
               >
+                <option value={15}>15 seconds</option>
+                <option value={30}>30 seconds</option>
                 <option value={60}>1 minute</option>
                 <option value={120}>2 minutes</option>
                 <option value={180}>3 minutes</option>
@@ -306,14 +274,16 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
 
       {game.status === "round_active" && (
         <section className="round-stage">
-          {(game.mode ?? "pinpointer") === "earth_classic" ? (
+          {(game.mode ?? "pinpointer") === "pin_central" ? (
+            <CentralClueGrid round={round} />
+          ) : isStreetMode(game.mode ?? "pinpointer") ? (
             <EarthStreetView round={round} />
           ) : (
             <img src={round.url} alt="Round clue" />
           )}
           <div className="round-overlay">
             <span className="kicker">{round.contentPack}</span>
-            <h1>{(game.mode ?? "pinpointer") === "earth_classic" ? "Explore the street map, then pinpoint it" : "Where was this taken?"}</h1>
+            <h1>{getRoundPrompt(game.mode ?? "pinpointer")}</h1>
             <p>{confirmedCount} of {game.players.length} players locked in</p>
           </div>
           <PlayerList game={game} />
@@ -361,7 +331,7 @@ export function HostScreen({ roomCode }: { roomCode?: string }) {
           <h1>{game.players[0] ? "Champion crowned" : "Game complete"}</h1>
           <Scoreboard game={game} showDistances={false} />
           <a className="primary-action final-action" href="/">
-            <RotateCcw size={18} /> New game
+            <Home size={18} /> Main menu
           </a>
         </section>
       )}
@@ -420,22 +390,29 @@ function ModeMenu({ value, onChange }: { value: GameMode; onChange: (mode: GameM
       <button type="button" className={value === "pinpointer" ? "selected" : ""} onClick={() => onChange("pinpointer")}>
         <MapPinned size={18} />
         <span>
-          <strong>Pinpointer</strong>
+          <strong>PinPoint Places</strong>
           <small>Famous landmarks, closest wins</small>
         </span>
       </button>
       <button type="button" className={value === "earth_classic" ? "selected" : ""} onClick={() => onChange("earth_classic")}>
-        <Route size={18} />
+        <Eye size={18} />
         <span>
-          <strong>Earth Classic</strong>
-          <small>Street-map exploration plus map guesses</small>
+          <strong>HeliView</strong>
+          <small>Guess the city based on aerial views</small>
         </span>
       </button>
-      <button type="button" disabled>
+      <button type="button" className={value === "geoguessr_classic" ? "selected" : ""} onClick={() => onChange("geoguessr_classic")}>
         <Globe2 size={18} />
         <span>
-          <strong>Pin Central</strong>
-          <small>Several places, one central point</small>
+          <strong>GeoGuessr Classic</strong>
+          <small>Explore the streets</small>
+        </span>
+      </button>
+      <button type="button" className={value === "pin_central" ? "selected" : ""} onClick={() => onChange("pin_central")}>
+        <Focus size={18} />
+        <span>
+          <strong>PinPoint Central</strong>
+          <small>Four clues, one central location</small>
         </span>
       </button>
     </fieldset>
@@ -443,7 +420,20 @@ function ModeMenu({ value, onChange }: { value: GameMode; onChange: (mode: GameM
 }
 
 function getModeLabel(mode: GameMode) {
-  return mode === "earth_classic" ? "Earth Classic" : "Pinpointer";
+  if (mode === "pin_central") return "PinPoint Central";
+  if (mode === "geoguessr_classic") return "GeoGuessr Classic";
+  return mode === "earth_classic" ? "HeliView" : "PinPoint Places";
+}
+
+function getRoundPrompt(mode: GameMode) {
+  if (mode === "pin_central") return "Find the centre point";
+  if (mode === "geoguessr_classic") return "Explore the streets, then place your pin";
+  if (mode === "earth_classic") return "Guess the city from above";
+  return "Where was this taken?";
+}
+
+function isStreetMode(mode: GameMode) {
+  return mode === "earth_classic" || mode === "geoguessr_classic";
 }
 
 function PlayerList({ game }: { game: GameState }) {
@@ -463,5 +453,19 @@ function PlayerList({ game }: { game: GameState }) {
       })}
       {game.players.length === 0 && <li className="empty-row">Waiting for players</li>}
     </ul>
+  );
+}
+
+function CentralClueGrid({ round }: { round: GameState["rounds"][number] }) {
+  const images = round.clueImages?.length ? round.clueImages : round.url ? [round.url] : [];
+
+  return (
+    <div className="central-clue-grid">
+      {images.slice(0, 4).map((imageUrl, index) => (
+        <figure key={`${round.id}-${imageUrl}`}>
+          <img src={imageUrl} alt={`Central clue ${index + 1}`} />
+        </figure>
+      ))}
+    </div>
   );
 }

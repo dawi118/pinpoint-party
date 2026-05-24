@@ -15,19 +15,7 @@ export function RevealMap({ game }: { game: GameState }) {
 
   return (
     <section className="reveal-layout">
-      <WorldGuessMap
-        disabled
-        actual={showAnswer ? { lat: round.actualLat, lng: round.actualLng } : undefined}
-        pins={visibleGuesses.map((guess) => {
-          const guessPlayer = game.players.find((item) => item.id === guess.playerId);
-          return {
-            id: guess.playerId,
-            label: guessPlayer?.displayName ?? "Player",
-            color: guessPlayer?.color ?? "#ffffff",
-            position: { lat: guess.lat, lng: guess.lng }
-          };
-        })}
-      />
+      <RevealGuessMap game={game} showAnswer={showAnswer} visibleGuesses={visibleGuesses} />
       <div className="reveal-callout">
         {showAnswer ? (
           <>
@@ -60,5 +48,33 @@ export function RevealMap({ game }: { game: GameState }) {
         )}
       </div>
     </section>
+  );
+}
+
+function RevealGuessMap({
+  game,
+  showAnswer,
+  visibleGuesses
+}: {
+  game: GameState;
+  showAnswer: boolean;
+  visibleGuesses: ReturnType<typeof sortGuessesForReveal>;
+}) {
+  const round = game.rounds[game.currentRoundIndex];
+
+  return (
+    <WorldGuessMap
+      disabled
+      actual={showAnswer ? { lat: round.actualLat, lng: round.actualLng } : undefined}
+      pins={visibleGuesses.map((guess) => {
+        const guessPlayer = game.players.find((item) => item.id === guess.playerId);
+        return {
+          id: guess.playerId,
+          label: guessPlayer?.displayName ?? "Player",
+          color: guessPlayer?.color ?? "#ffffff",
+          position: { lat: guess.lat, lng: guess.lng }
+        };
+      })}
+    />
   );
 }

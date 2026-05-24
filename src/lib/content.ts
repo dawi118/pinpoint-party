@@ -1,5 +1,6 @@
 import { GameMode, MediaRound } from "./types";
 import { randomInt } from "./random";
+import { mapSpaceMean } from "./geo";
 
 export const PINPOINTER_CONTENT_BANK: MediaRound[] = [
   {
@@ -188,6 +189,94 @@ export const PINPOINTER_CONTENT_BANK: MediaRound[] = [
     contentPack: "Architecture",
     difficulty: "medium",
     attribution: "Photo via Unsplash"
+  },
+  {
+    id: "pyramids-of-giza",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 29.9792,
+    actualLng: 31.1342,
+    locationLabel: "Pyramids of Giza, Egypt",
+    contentPack: "Ancient Wonders",
+    difficulty: "easy",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "golden-gate-bridge",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 37.8199,
+    actualLng: -122.4783,
+    locationLabel: "Golden Gate Bridge, San Francisco",
+    contentPack: "World Landmarks",
+    difficulty: "easy",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "chichen-itza",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1518638150340-f706e86654de?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 20.6843,
+    actualLng: -88.5678,
+    locationLabel: "Chichen Itza, Mexico",
+    contentPack: "Ancient Wonders",
+    difficulty: "medium",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "hagia-sophia",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 41.0086,
+    actualLng: 28.9802,
+    locationLabel: "Hagia Sophia, Istanbul",
+    contentPack: "Architecture",
+    difficulty: "medium",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "brandenburg-gate",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1560969184-10fe8719e047?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 52.5163,
+    actualLng: 13.3777,
+    locationLabel: "Brandenburg Gate, Berlin",
+    contentPack: "World Landmarks",
+    difficulty: "easy",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "victoria-falls",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1528460033278-a6ba57020470?auto=format&fit=crop&w=1800&q=80",
+    actualLat: -17.9243,
+    actualLng: 25.8572,
+    locationLabel: "Victoria Falls, Zambia/Zimbabwe",
+    contentPack: "Nature Icons",
+    difficulty: "hard",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "banff-lake-louise",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 51.4254,
+    actualLng: -116.1773,
+    locationLabel: "Lake Louise, Banff",
+    contentPack: "Nature Icons",
+    difficulty: "hard",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "prague-charles-bridge",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1541849546-216549ae216d?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 50.0865,
+    actualLng: 14.4114,
+    locationLabel: "Charles Bridge, Prague",
+    contentPack: "Architecture",
+    difficulty: "medium",
+    attribution: "Photo via Unsplash"
   }
 ];
 
@@ -198,7 +287,7 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
     actualLat: 40.758,
     actualLng: -73.9855,
     locationLabel: "Times Square, New York",
-    contentPack: "Earth Classic",
+    contentPack: "HeliView",
     difficulty: "easy",
     attribution: "Street-map view via OpenFreeMap",
     streetView: {
@@ -214,7 +303,7 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
     actualLat: 51.5007,
     actualLng: -0.1246,
     locationLabel: "Westminster, London",
-    contentPack: "Earth Classic",
+    contentPack: "HeliView",
     difficulty: "easy",
     attribution: "Street-map view via OpenFreeMap",
     streetView: {
@@ -230,7 +319,7 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
     actualLat: 35.6595,
     actualLng: 139.7005,
     locationLabel: "Shibuya Crossing, Tokyo",
-    contentPack: "Earth Classic",
+    contentPack: "HeliView",
     difficulty: "medium",
     attribution: "Street-map view via OpenFreeMap",
     streetView: {
@@ -246,7 +335,7 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
     actualLat: 48.8867,
     actualLng: 2.3431,
     locationLabel: "Montmartre, Paris",
-    contentPack: "Earth Classic",
+    contentPack: "HeliView",
     difficulty: "medium",
     attribution: "Street-map view via OpenFreeMap",
     streetView: {
@@ -262,7 +351,7 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
     actualLat: -32.0569,
     actualLng: 115.7439,
     locationLabel: "Fremantle, Australia",
-    contentPack: "Earth Classic",
+    contentPack: "HeliView",
     difficulty: "hard",
     attribution: "Street-map view via OpenFreeMap",
     streetView: {
@@ -278,7 +367,7 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
     actualLat: 19.4326,
     actualLng: -99.1332,
     locationLabel: "Centro Historico, Mexico City",
-    contentPack: "Earth Classic",
+    contentPack: "HeliView",
     difficulty: "medium",
     attribution: "Street-map view via OpenFreeMap",
     streetView: {
@@ -294,7 +383,7 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
     actualLat: -33.9249,
     actualLng: 18.4241,
     locationLabel: "Cape Town City Bowl",
-    contentPack: "Earth Classic",
+    contentPack: "HeliView",
     difficulty: "hard",
     attribution: "Street-map view via OpenFreeMap",
     streetView: {
@@ -310,7 +399,7 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
     actualLat: 41.3851,
     actualLng: 2.1734,
     locationLabel: "Gothic Quarter, Barcelona",
-    contentPack: "Earth Classic",
+    contentPack: "HeliView",
     difficulty: "medium",
     attribution: "Street-map view via OpenFreeMap",
     streetView: {
@@ -326,7 +415,7 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
     actualLat: 49.2827,
     actualLng: -123.1207,
     locationLabel: "Downtown Vancouver",
-    contentPack: "Earth Classic",
+    contentPack: "HeliView",
     difficulty: "hard",
     attribution: "Street-map view via OpenFreeMap",
     streetView: {
@@ -342,7 +431,7 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
     actualLat: 45.4372,
     actualLng: 12.3359,
     locationLabel: "San Marco, Venice",
-    contentPack: "Earth Classic",
+    contentPack: "HeliView",
     difficulty: "hard",
     attribution: "Street-map view via OpenFreeMap",
     streetView: {
@@ -351,17 +440,544 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
       heading: 292,
       zoom: 16.5
     }
+  },
+  {
+    id: "earth-classic-singapore",
+    type: "street",
+    actualLat: 1.2834,
+    actualLng: 103.8607,
+    locationLabel: "Marina Bay, Singapore",
+    contentPack: "HeliView",
+    difficulty: "medium",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 1.2849,
+      startLng: 103.861,
+      heading: 215,
+      zoom: 16.2
+    }
+  },
+  {
+    id: "earth-classic-marrakech",
+    type: "street",
+    actualLat: 31.6258,
+    actualLng: -7.9891,
+    locationLabel: "Medina, Marrakech",
+    contentPack: "HeliView",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 31.6262,
+      startLng: -7.9867,
+      heading: 246,
+      zoom: 16.1
+    }
+  },
+  {
+    id: "earth-classic-buenos-aires",
+    type: "street",
+    actualLat: -34.6037,
+    actualLng: -58.3816,
+    locationLabel: "Buenos Aires Microcentro",
+    contentPack: "HeliView",
+    difficulty: "medium",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: -34.6076,
+      startLng: -58.3737,
+      heading: 302,
+      zoom: 16
+    }
+  },
+  {
+    id: "earth-classic-stockholm",
+    type: "street",
+    actualLat: 59.325,
+    actualLng: 18.0711,
+    locationLabel: "Gamla Stan, Stockholm",
+    contentPack: "HeliView",
+    difficulty: "medium",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 59.3256,
+      startLng: 18.0716,
+      heading: 174,
+      zoom: 16.4
+    }
+  },
+  {
+    id: "earth-classic-hanoi",
+    type: "street",
+    actualLat: 21.0285,
+    actualLng: 105.8542,
+    locationLabel: "Old Quarter, Hanoi",
+    contentPack: "HeliView",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 21.0333,
+      startLng: 105.8501,
+      heading: 128,
+      zoom: 16
+    }
+  },
+  {
+    id: "earth-classic-quebec-city",
+    type: "street",
+    actualLat: 46.8139,
+    actualLng: -71.208,
+    locationLabel: "Old Quebec City",
+    contentPack: "HeliView",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 46.8122,
+      startLng: -71.2051,
+      heading: 38,
+      zoom: 16.2
+    }
+  },
+  {
+    id: "earth-classic-prague",
+    type: "street",
+    actualLat: 50.087,
+    actualLng: 14.4208,
+    locationLabel: "Old Town Square, Prague",
+    contentPack: "HeliView",
+    difficulty: "easy",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 50.0875,
+      startLng: 14.4213,
+      heading: 206,
+      zoom: 16.4
+    }
+  },
+  {
+    id: "earth-classic-wellington",
+    type: "street",
+    actualLat: -41.2865,
+    actualLng: 174.7762,
+    locationLabel: "Wellington Waterfront",
+    contentPack: "HeliView",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: -41.2851,
+      startLng: 174.7782,
+      heading: 244,
+      zoom: 16
+    }
   }
 ];
 
+export const GEOGUESSR_CLASSIC_CONTENT_BANK: MediaRound[] = EARTH_CLASSIC_CONTENT_BANK.map((round) => ({
+  ...round,
+  id: round.id.replace("earth-classic", "geoguessr-classic"),
+  contentPack: "GeoGuessr Classic",
+  attribution: "Street panorama"
+}));
+
+const PIN_CENTRAL_CITY_BANK: MediaRound[] = [
+  {
+    id: "central-london",
+    type: "image",
+    actualLat: 51.5074,
+    actualLng: -0.1278,
+    locationLabel: "Central London",
+    contentPack: "PinPoint Central",
+    difficulty: "easy",
+    attribution: "Photos via Unsplash",
+    clueImages: [
+      "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1486299267070-83823f5448dd?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?auto=format&fit=crop&w=900&q=80"
+    ]
+  },
+  {
+    id: "central-paris",
+    type: "image",
+    actualLat: 48.8566,
+    actualLng: 2.3522,
+    locationLabel: "Central Paris",
+    contentPack: "PinPoint Central",
+    difficulty: "easy",
+    attribution: "Photos via Unsplash",
+    clueImages: [
+      "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1522093007474-d86e9bf7ba6f?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1549144511-f099e773c147?auto=format&fit=crop&w=900&q=80"
+    ]
+  },
+  {
+    id: "central-new-york",
+    type: "image",
+    actualLat: 40.7128,
+    actualLng: -74.006,
+    locationLabel: "New York City",
+    contentPack: "PinPoint Central",
+    difficulty: "easy",
+    attribution: "Photos via Unsplash",
+    clueImages: [
+      "https://images.unsplash.com/photo-1543716091-a840c05249ec?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1499092346589-b9b6be3e94b2?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1518391846015-55a9cc003b25?auto=format&fit=crop&w=900&q=80"
+    ]
+  },
+  {
+    id: "central-rome",
+    type: "image",
+    actualLat: 41.9028,
+    actualLng: 12.4964,
+    locationLabel: "Central Rome",
+    contentPack: "PinPoint Central",
+    difficulty: "medium",
+    attribution: "Photos via Unsplash",
+    clueImages: [
+      "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1529154036614-a60975f5c760?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1529260830199-42c24126f198?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?auto=format&fit=crop&w=900&q=80"
+    ]
+  },
+  {
+    id: "central-tokyo",
+    type: "image",
+    actualLat: 35.6762,
+    actualLng: 139.6503,
+    locationLabel: "Central Tokyo",
+    contentPack: "PinPoint Central",
+    difficulty: "medium",
+    attribution: "Photos via Unsplash",
+    clueImages: [
+      "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=900&q=80"
+    ]
+  },
+  {
+    id: "central-sydney",
+    type: "image",
+    actualLat: -33.8688,
+    actualLng: 151.2093,
+    locationLabel: "Central Sydney",
+    contentPack: "PinPoint Central",
+    difficulty: "medium",
+    attribution: "Photos via Unsplash",
+    clueImages: [
+      "https://images.unsplash.com/photo-1523428096881-5bd79d043006?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1528072164453-f4e8ef0d475a?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1516941064643-74aacd84843c?auto=format&fit=crop&w=900&q=80"
+    ]
+  },
+  {
+    id: "central-dubai",
+    type: "image",
+    actualLat: 25.2048,
+    actualLng: 55.2708,
+    locationLabel: "Central Dubai",
+    contentPack: "PinPoint Central",
+    difficulty: "medium",
+    attribution: "Photos via Unsplash",
+    clueImages: [
+      "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1526495124232-a04e1849168c?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?auto=format&fit=crop&w=900&q=80"
+    ]
+  },
+  {
+    id: "central-barcelona",
+    type: "image",
+    actualLat: 41.3874,
+    actualLng: 2.1686,
+    locationLabel: "Central Barcelona",
+    contentPack: "PinPoint Central",
+    difficulty: "medium",
+    attribution: "Photos via Unsplash",
+    clueImages: [
+      "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1511527661048-7fe73d85e9a4?auto=format&fit=crop&w=900&q=80"
+    ]
+  },
+  {
+    id: "central-rio",
+    type: "image",
+    actualLat: -22.9068,
+    actualLng: -43.1729,
+    locationLabel: "Rio de Janeiro",
+    contentPack: "PinPoint Central",
+    difficulty: "hard",
+    attribution: "Photos via Unsplash",
+    clueImages: [
+      "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1544989164-31dc3c645987?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1525874684015-58379d421a52?auto=format&fit=crop&w=900&q=80"
+    ]
+  },
+  {
+    id: "central-istanbul",
+    type: "image",
+    actualLat: 41.0082,
+    actualLng: 28.9784,
+    locationLabel: "Central Istanbul",
+    contentPack: "PinPoint Central",
+    difficulty: "hard",
+    attribution: "Photos via Unsplash",
+    clueImages: [
+      "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1527838832700-5059252407fa?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1549918864-48ac978761a4?auto=format&fit=crop&w=900&q=80"
+    ]
+  }
+];
+
+const PIN_CENTRAL_SETS: Array<{
+  id: string;
+  label: string;
+  difficulty: "easy" | "medium" | "hard";
+  clues: Array<{ url: string; lat: number; lng: number; label: string }>;
+}> = [
+  {
+    id: "atlantic-balance",
+    label: "Atlantic balance point",
+    difficulty: "medium",
+    clues: [
+      { label: "New York", lat: 40.7128, lng: -74.006, url: "https://images.unsplash.com/photo-1543716091-a840c05249ec?auto=format&fit=crop&w=900&q=80" },
+      { label: "Chicago", lat: 41.8781, lng: -87.6298, url: "https://images.unsplash.com/photo-1494522855154-9297ac14b55f?auto=format&fit=crop&w=900&q=80" },
+      { label: "Los Angeles", lat: 34.0522, lng: -118.2437, url: "https://images.unsplash.com/photo-1534190760961-74e8c1c5c3da?auto=format&fit=crop&w=900&q=80" },
+      { label: "Sydney", lat: -33.8688, lng: 151.2093, url: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "euro-africa-centre",
+    label: "Europe-Africa midpoint",
+    difficulty: "easy",
+    clues: [
+      { label: "London", lat: 51.5074, lng: -0.1278, url: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=900&q=80" },
+      { label: "Paris", lat: 48.8566, lng: 2.3522, url: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=900&q=80" },
+      { label: "Rome", lat: 41.9028, lng: 12.4964, url: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=900&q=80" },
+      { label: "Cairo", lat: 30.0444, lng: 31.2357, url: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "pacific-ring",
+    label: "Pacific ring average",
+    difficulty: "hard",
+    clues: [
+      { label: "Tokyo", lat: 35.6762, lng: 139.6503, url: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=900&q=80" },
+      { label: "Auckland", lat: -36.8509, lng: 174.7645, url: "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=900&q=80" },
+      { label: "San Francisco", lat: 37.7749, lng: -122.4194, url: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=900&q=80" },
+      { label: "Honolulu", lat: 21.3069, lng: -157.8583, url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "americas-spread",
+    label: "Americas spread",
+    difficulty: "medium",
+    clues: [
+      { label: "Vancouver", lat: 49.2827, lng: -123.1207, url: "https://images.unsplash.com/photo-1559511260-66a654ae982a?auto=format&fit=crop&w=900&q=80" },
+      { label: "Mexico City", lat: 19.4326, lng: -99.1332, url: "https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?auto=format&fit=crop&w=900&q=80" },
+      { label: "Rio de Janeiro", lat: -22.9068, lng: -43.1729, url: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=900&q=80" },
+      { label: "Buenos Aires", lat: -34.6037, lng: -58.3816, url: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "global-crossroads",
+    label: "Global crossroads",
+    difficulty: "hard",
+    clues: [
+      { label: "London", lat: 51.5074, lng: -0.1278, url: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=900&q=80" },
+      { label: "New York", lat: 40.7128, lng: -74.006, url: "https://images.unsplash.com/photo-1543716091-a840c05249ec?auto=format&fit=crop&w=900&q=80" },
+      { label: "Tokyo", lat: 35.6762, lng: 139.6503, url: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=900&q=80" },
+      { label: "Cape Town", lat: -33.9249, lng: 18.4241, url: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "silk-road-centre",
+    label: "Silk road centre",
+    difficulty: "medium",
+    clues: [
+      { label: "Istanbul", lat: 41.0082, lng: 28.9784, url: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=900&q=80" },
+      { label: "Dubai", lat: 25.2048, lng: 55.2708, url: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=900&q=80" },
+      { label: "Delhi", lat: 28.6139, lng: 77.209, url: "https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=900&q=80" },
+      { label: "Bangkok", lat: 13.7563, lng: 100.5018, url: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "southern-oceans",
+    label: "Southern oceans average",
+    difficulty: "hard",
+    clues: [
+      { label: "Cape Town", lat: -33.9249, lng: 18.4241, url: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=900&q=80" },
+      { label: "Perth", lat: -31.9523, lng: 115.8613, url: "https://images.unsplash.com/photo-1524586410818-196d249560e4?auto=format&fit=crop&w=900&q=80" },
+      { label: "Santiago", lat: -33.4489, lng: -70.6693, url: "https://images.unsplash.com/photo-1597006438013-6f0cca2c9ab6?auto=format&fit=crop&w=900&q=80" },
+      { label: "Auckland", lat: -36.8509, lng: 174.7645, url: "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "north-world",
+    label: "Northern world average",
+    difficulty: "medium",
+    clues: [
+      { label: "Reykjavik", lat: 64.1466, lng: -21.9426, url: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?auto=format&fit=crop&w=900&q=80" },
+      { label: "Oslo", lat: 59.9139, lng: 10.7522, url: "https://images.unsplash.com/photo-1605832666463-1ff6c721bb7b?auto=format&fit=crop&w=900&q=80" },
+      { label: "Toronto", lat: 43.6532, lng: -79.3832, url: "https://images.unsplash.com/photo-1517090504586-fde19ea6066f?auto=format&fit=crop&w=900&q=80" },
+      { label: "Seoul", lat: 37.5665, lng: 126.978, url: "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "indian-ocean-pull",
+    label: "Indian Ocean pull",
+    difficulty: "hard",
+    clues: [
+      { label: "Mumbai", lat: 19.076, lng: 72.8777, url: "https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=900&q=80" },
+      { label: "Nairobi", lat: -1.2921, lng: 36.8219, url: "https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?auto=format&fit=crop&w=900&q=80" },
+      { label: "Singapore", lat: 1.3521, lng: 103.8198, url: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=900&q=80" },
+      { label: "Perth", lat: -31.9523, lng: 115.8613, url: "https://images.unsplash.com/photo-1524586410818-196d249560e4?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "med-atlantic-mix",
+    label: "Mediterranean-Atlantic mix",
+    difficulty: "easy",
+    clues: [
+      { label: "Lisbon", lat: 38.7223, lng: -9.1393, url: "https://images.unsplash.com/photo-1548707309-dcebeab9ea9b?auto=format&fit=crop&w=900&q=80" },
+      { label: "Madrid", lat: 40.4168, lng: -3.7038, url: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=900&q=80" },
+      { label: "Casablanca", lat: 33.5731, lng: -7.5898, url: "https://images.unsplash.com/photo-1548018560-c7196548e84d?auto=format&fit=crop&w=900&q=80" },
+      { label: "Rome", lat: 41.9028, lng: 12.4964, url: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "andes-arc",
+    label: "Andes arc average",
+    difficulty: "hard",
+    clues: [
+      { label: "Quito", lat: -0.1807, lng: -78.4678, url: "https://images.unsplash.com/photo-1588979355313-6711a095465f?auto=format&fit=crop&w=900&q=80" },
+      { label: "Lima", lat: -12.0464, lng: -77.0428, url: "https://images.unsplash.com/photo-1531968455001-5c5272a41129?auto=format&fit=crop&w=900&q=80" },
+      { label: "La Paz", lat: -16.4897, lng: -68.1193, url: "https://images.unsplash.com/photo-1544985361-b420d7a77043?auto=format&fit=crop&w=900&q=80" },
+      { label: "Santiago", lat: -33.4489, lng: -70.6693, url: "https://images.unsplash.com/photo-1597006438013-6f0cca2c9ab6?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "nordic-capitals",
+    label: "Nordic capitals centre",
+    difficulty: "medium",
+    clues: [
+      { label: "Copenhagen", lat: 55.6761, lng: 12.5683, url: "https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?auto=format&fit=crop&w=900&q=80" },
+      { label: "Stockholm", lat: 59.3293, lng: 18.0686, url: "https://images.unsplash.com/photo-1509356843151-3e7d96241e11?auto=format&fit=crop&w=900&q=80" },
+      { label: "Oslo", lat: 59.9139, lng: 10.7522, url: "https://images.unsplash.com/photo-1605832666463-1ff6c721bb7b?auto=format&fit=crop&w=900&q=80" },
+      { label: "Helsinki", lat: 60.1699, lng: 24.9384, url: "https://images.unsplash.com/photo-1559058922-b6c02c31c103?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "african-great-lakes",
+    label: "African great lakes pull",
+    difficulty: "hard",
+    clues: [
+      { label: "Kampala", lat: 0.3476, lng: 32.5825, url: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=900&q=80" },
+      { label: "Kigali", lat: -1.9441, lng: 30.0619, url: "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=900&q=80" },
+      { label: "Nairobi", lat: -1.2921, lng: 36.8219, url: "https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?auto=format&fit=crop&w=900&q=80" },
+      { label: "Dar es Salaam", lat: -6.7924, lng: 39.2083, url: "https://images.unsplash.com/photo-1550850839-8dc894ed385a?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "east-asia-megalopolis",
+    label: "East Asia megalopolis",
+    difficulty: "medium",
+    clues: [
+      { label: "Seoul", lat: 37.5665, lng: 126.978, url: "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80" },
+      { label: "Shanghai", lat: 31.2304, lng: 121.4737, url: "https://images.unsplash.com/photo-1506158669146-619067262a00?auto=format&fit=crop&w=900&q=80" },
+      { label: "Taipei", lat: 25.033, lng: 121.5654, url: "https://images.unsplash.com/photo-1549693578-d683be217e58?auto=format&fit=crop&w=900&q=80" },
+      { label: "Hong Kong", lat: 22.3193, lng: 114.1694, url: "https://images.unsplash.com/photo-1536599018102-9f803c140fc1?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "canadian-crossing",
+    label: "Canadian crossing",
+    difficulty: "easy",
+    clues: [
+      { label: "Vancouver", lat: 49.2827, lng: -123.1207, url: "https://images.unsplash.com/photo-1559511260-66a654ae982a?auto=format&fit=crop&w=900&q=80" },
+      { label: "Calgary", lat: 51.0447, lng: -114.0719, url: "https://images.unsplash.com/photo-1571789288651-c0869d9e23b4?auto=format&fit=crop&w=900&q=80" },
+      { label: "Toronto", lat: 43.6532, lng: -79.3832, url: "https://images.unsplash.com/photo-1517090504586-fde19ea6066f?auto=format&fit=crop&w=900&q=80" },
+      { label: "Montreal", lat: 45.5017, lng: -73.5673, url: "https://images.unsplash.com/photo-1519178614-68673b201f36?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "south-east-asia",
+    label: "Southeast Asia blend",
+    difficulty: "medium",
+    clues: [
+      { label: "Bangkok", lat: 13.7563, lng: 100.5018, url: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=900&q=80" },
+      { label: "Ho Chi Minh City", lat: 10.8231, lng: 106.6297, url: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=900&q=80" },
+      { label: "Kuala Lumpur", lat: 3.139, lng: 101.6869, url: "https://images.unsplash.com/photo-1508964942454-1a56651d54ac?auto=format&fit=crop&w=900&q=80" },
+      { label: "Singapore", lat: 1.3521, lng: 103.8198, url: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=900&q=80" }
+    ]
+  }
+];
+
+export const PIN_CENTRAL_CONTENT_BANK: MediaRound[] = PIN_CENTRAL_SETS.map((set) => {
+  const center = mapSpaceMean(set.clues.map((clue) => ({ lat: clue.lat, lng: clue.lng })));
+
+  return {
+    id: `pin-central-${set.id}`,
+    type: "image",
+    actualLat: center.lat,
+    actualLng: center.lng,
+    locationLabel: set.label,
+    contentPack: "PinPoint Central",
+    difficulty: set.difficulty,
+    attribution: "Photos via Unsplash",
+    clueImages: set.clues.map((clue) => clue.url),
+    imageClues: set.clues
+  };
+});
+
 export function pickRounds(count: 3 | 5 | 10, mode: GameMode = "pinpointer"): MediaRound[] {
-  const bank = mode === "earth_classic" ? EARTH_CLASSIC_CONTENT_BANK : PINPOINTER_CONTENT_BANK;
+  const bank =
+    mode === "pin_central"
+      ? PIN_CENTRAL_CONTENT_BANK
+      : mode === "geoguessr_classic"
+      ? GEOGUESSR_CLASSIC_CONTENT_BANK
+      : mode === "earth_classic"
+        ? EARTH_CLASSIC_CONTENT_BANK
+        : PINPOINTER_CONTENT_BANK;
   const needed = Math.min(count, bank.length);
-  return shuffle(bank).slice(0, needed);
+  return shuffle(bank).slice(0, needed).map(randomizeRoundContent);
 }
 
-function shuffle(rounds: MediaRound[]): MediaRound[] {
-  const next = [...rounds];
+function randomizeRoundContent(round: MediaRound): MediaRound {
+  if (round.imageClues?.length) {
+    const imageClues = shuffle(round.imageClues);
+
+    return {
+      ...round,
+      imageClues,
+      clueImages: imageClues.map((clue) => clue.url)
+    };
+  }
+
+  if (round.clueImages?.length) {
+    return {
+      ...round,
+      clueImages: shuffle(round.clueImages)
+    };
+  }
+
+  return { ...round };
+}
+
+function shuffle<T>(items: T[]): T[] {
+  const next = [...items];
 
   for (let index = next.length - 1; index > 0; index -= 1) {
     const randomIndex = randomInt(index + 1);

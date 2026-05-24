@@ -3,6 +3,7 @@ import { FormEvent, useState } from "react";
 import { addPlayer, getAvailableColors } from "../lib/gameState";
 import { fetchGame, saveGame } from "../lib/localGameStore";
 import { normalizeRoomCode } from "../lib/roomCodes";
+import { AppLogo } from "./AppLogo";
 
 export function JoinScreen({ initialRoomCode }: { initialRoomCode?: string }) {
   const [roomCode, setRoomCode] = useState(normalizeRoomCode(initialRoomCode ?? ""));
@@ -38,16 +39,18 @@ export function JoinScreen({ initialRoomCode }: { initialRoomCode?: string }) {
 
   return (
     <main className="app phone-shell">
+      <AppLogo />
       <form className="phone-panel" onSubmit={joinGame}>
-        <span className="kicker">Join game</span>
-        <h1>Pinpoint Party</h1>
+        <span className="kicker">Join PinPoint Party</span>
+        <h1>Enter the room</h1>
+        <p>Use the four-letter code on the host screen, then choose how you will appear on the scoreboard.</p>
         <label>
           <span>Room code</span>
-          <input value={roomCode} maxLength={4} onChange={(event) => setRoomCode(normalizeRoomCode(event.target.value))} placeholder="ABCD" />
+          <input value={roomCode} maxLength={4} onChange={(event) => setRoomCode(normalizeRoomCode(event.target.value))} />
         </label>
         <label>
           <span>Name</span>
-          <input value={displayName} maxLength={16} onChange={(event) => setDisplayName(event.target.value)} placeholder="Your name" />
+          <input value={displayName} maxLength={16} onChange={(event) => setDisplayName(event.target.value)} />
         </label>
         <div className="color-row" aria-label="Choose a player color">
           {getAvailableColors().map((item) => (
