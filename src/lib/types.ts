@@ -1,5 +1,5 @@
 export type GameStatus = "lobby" | "round_active" | "revealing" | "scoreboard" | "finished";
-export type GameMode = "pinpointer" | "pin_central" | "heliview" | "earth_classic";
+export type GameMode = "pinpointer" | "pin_central" | "heliview" | "earth_classic" | "geoguessr_classic";
 
 export type StreetViewSeed = {
   startLat: number;
@@ -8,10 +8,28 @@ export type StreetViewSeed = {
   zoom: number;
 };
 
+export type StreetMovementPoint = {
+  lat: number;
+  lng: number;
+  heading: number;
+  pitch: number;
+  zoom: number;
+  recordedAt: string;
+};
+
+export type ImageClue = {
+  url: string;
+  lat: number;
+  lng: number;
+  label: string;
+};
+
 export type MediaRound = {
   id: string;
   type: "image" | "video" | "street";
   url?: string;
+  clueImages?: string[];
+  imageClues?: ImageClue[];
   thumbnailUrl?: string;
   actualLat: number;
   actualLng: number;
@@ -70,5 +88,6 @@ export type GameState = {
   players: Player[];
   rounds: MediaRound[];
   guessesByRound: Record<number, Guess[]>;
+  streetMovementsByRound?: Record<number, Record<string, StreetMovementPoint[]>>;
   createdAt: string;
 };

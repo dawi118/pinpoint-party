@@ -1,8 +1,9 @@
 import { pickRounds } from "./content";
+import { clampLatLng } from "./geo";
 import { createId } from "./random";
 import { generateRoomCode } from "./roomCodes";
 import { scoreGuess } from "./scoring";
-import { GameMode, GameState, Guess, Player } from "./types";
+import { GameMode, GameState, Guess, Player, StreetMovementPoint } from "./types";
 
 const COLORS = ["#00A6A6", "#FF6B57", "#F6C85F", "#7B61FF", "#2FBF71", "#F55FA6", "#2D9CDB", "#F2994A"];
 const AVATARS = ["Compass", "Rocket", "Beacon", "Globe", "Flag", "Spark", "Radar", "Peak"];
@@ -31,6 +32,7 @@ export function createInitialGame(options?: {
     players: [],
     rounds: pickRounds(roundCount, mode),
     guessesByRound: {},
+    streetMovementsByRound: {},
     createdAt: new Date().toISOString()
   };
 }
@@ -83,6 +85,10 @@ export function startRound(game: GameState): GameState {
     scoreboardStartedAt: undefined,
     nextRoundStartsAt: undefined,
     readyPlayerIds: [],
+    streetMovementsByRound: {
+      ...(game.streetMovementsByRound ?? {}),
+      [game.currentRoundIndex]: game.streetMovementsByRound?.[game.currentRoundIndex] ?? {}
+    },
     guessesByRound: {
       ...game.guessesByRound,
       [game.currentRoundIndex]: game.guessesByRound[game.currentRoundIndex] ?? []
@@ -93,13 +99,14 @@ export function startRound(game: GameState): GameState {
 export function upsertGuess(game: GameState, playerId: string, lat: number, lng: number): GameState {
   if (game.status !== "round_active") return game;
 
+  const position = clampLatLng({ lat, lng });
   const roundIndex = game.currentRoundIndex;
   const guesses = game.guessesByRound[roundIndex] ?? [];
   const existing = guesses.find((guess) => guess.playerId === playerId);
   const nextGuess: Guess = {
     playerId,
-    lat,
-    lng,
+    lat: position.lat,
+    lng: position.lng,
     confirmed: existing?.confirmed ?? false,
     confirmedAt: existing?.confirmedAt
   };
@@ -113,6 +120,27 @@ export function upsertGuess(game: GameState, playerId: string, lat: number, lng:
     guessesByRound: {
       ...game.guessesByRound,
       [roundIndex]: nextGuesses
+    }
+  };
+}
+
+export function logStreetMovement(game: GameState, playerId: string, point: StreetMovementPoint): GameState {
+  if (game.status !== "round_active" || game.mode !== "geoguessr_classic") return game;
+  if (!game.players.some((player) => player.id === playerId)) return game;
+
+  const roundIndex = game.currentRoundIndex;
+  const movementsByRound = game.streetMovementsByRound ?? {};
+  const movementsByPlayer = movementsByRound[roundIndex] ?? {};
+  const existing = movementsByPlayer[playerId] ?? [];
+
+  return {
+    ...game,
+    streetMovementsByRound: {
+      ...movementsByRound,
+      [roundIndex]: {
+        ...movementsByPlayer,
+        [playerId]: [...existing, point].slice(-160)
+      }
     }
   };
 }
@@ -180,6 +208,14 @@ export function advanceReveal(game: GameState): GameState {
     ...game,
     revealStep: Math.min(maxStep, game.revealStep + 1)
   };
+}
+
+export function getRoundStreetMovements(game: GameState) {
+  return game.streetMovementsByRound?.[game.currentRoundIndex] ?? {};
+}
+
+export function getStreetMovementPath(game: GameState, playerId: string) {
+  return getRoundStreetMovements(game)[playerId] ?? [];
 }
 
 export function showScoreboard(game: GameState): GameState {

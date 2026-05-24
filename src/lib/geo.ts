@@ -6,10 +6,13 @@ export type Coordinates = {
 const EARTH_RADIUS_KM = 6371;
 
 const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+export function normalizeLng(lng: number): number {
+  return ((((lng + 180) % 360) + 360) % 360) - 180;
+}
 
 export function haversineDistanceKm(a: Coordinates, b: Coordinates): number {
   const dLat = toRadians(b.lat - a.lat);
-  const dLng = toRadians(b.lng - a.lng);
+  const dLng = toRadians(normalizeLng(b.lng - a.lng));
   const lat1 = toRadians(a.lat);
   const lat2 = toRadians(b.lat);
 
@@ -23,8 +26,25 @@ export function haversineDistanceKm(a: Coordinates, b: Coordinates): number {
 export function clampLatLng(position: Coordinates): Coordinates {
   return {
     lat: Math.max(-85, Math.min(85, position.lat)),
-    lng: Math.max(-180, Math.min(180, position.lng))
+    lng: normalizeLng(position.lng)
   };
+}
+
+export function mapSpaceMean(points: Coordinates[]): Coordinates {
+  if (points.length === 0) return { lat: 0, lng: 0 };
+
+  const total = points.reduce(
+    (sum, point) => ({
+      lat: sum.lat + point.lat,
+      lng: sum.lng + normalizeLng(point.lng)
+    }),
+    { lat: 0, lng: 0 }
+  );
+
+  return clampLatLng({
+    lat: total.lat / points.length,
+    lng: total.lng / points.length
+  });
 }
 
 export function latLngToPercent(position: Coordinates) {
