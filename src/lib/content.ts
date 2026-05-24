@@ -277,6 +277,138 @@ export const PINPOINTER_CONTENT_BANK: MediaRound[] = [
     contentPack: "Architecture",
     difficulty: "medium",
     attribution: "Photo via Unsplash"
+  },
+  {
+    id: "st-basils-cathedral",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1513326738677-b964603b136d?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 55.7525,
+    actualLng: 37.6231,
+    locationLabel: "St Basil's Cathedral, Moscow",
+    contentPack: "World Landmarks",
+    difficulty: "medium",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "acropolis-athens",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1555993539-1732b0258235?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 37.9715,
+    actualLng: 23.7257,
+    locationLabel: "Acropolis of Athens",
+    contentPack: "Ancient Wonders",
+    difficulty: "medium",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "alhambra-granada",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 37.1761,
+    actualLng: -3.5881,
+    locationLabel: "Alhambra, Granada",
+    contentPack: "Architecture",
+    difficulty: "hard",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "sheikh-zayed-mosque",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1512632578888-169bbbc64f33?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 24.4128,
+    actualLng: 54.4749,
+    locationLabel: "Sheikh Zayed Grand Mosque, Abu Dhabi",
+    contentPack: "Architecture",
+    difficulty: "medium",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "potala-palace",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 29.6578,
+    actualLng: 91.1169,
+    locationLabel: "Potala Palace, Lhasa",
+    contentPack: "World Landmarks",
+    difficulty: "hard",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "ha-long-bay",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 20.9101,
+    actualLng: 107.1839,
+    locationLabel: "Ha Long Bay, Vietnam",
+    contentPack: "Nature Icons",
+    difficulty: "medium",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "matterhorn-zermatt",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 45.9763,
+    actualLng: 7.6586,
+    locationLabel: "Matterhorn, Switzerland",
+    contentPack: "Nature Icons",
+    difficulty: "hard",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "wat-arun",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 13.7437,
+    actualLng: 100.4889,
+    locationLabel: "Wat Arun, Bangkok",
+    contentPack: "Architecture",
+    difficulty: "medium",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "meteora-monasteries",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 39.7217,
+    actualLng: 21.6306,
+    locationLabel: "Meteora Monasteries, Greece",
+    contentPack: "Nature Icons",
+    difficulty: "hard",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "moai-rapa-nui",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1589793907316-f94025b46850?auto=format&fit=crop&w=1800&q=80",
+    actualLat: -27.1212,
+    actualLng: -109.3664,
+    locationLabel: "Moai of Rapa Nui, Easter Island",
+    contentPack: "Ancient Wonders",
+    difficulty: "hard",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "blue-mosque-istanbul",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 41.0054,
+    actualLng: 28.9768,
+    locationLabel: "Blue Mosque, Istanbul",
+    contentPack: "Architecture",
+    difficulty: "medium",
+    attribution: "Photo via Unsplash"
+  },
+  {
+    id: "marina-bay-sands",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1800&q=80",
+    actualLat: 1.2834,
+    actualLng: 103.8607,
+    locationLabel: "Marina Bay Sands, Singapore",
+    contentPack: "Modern Icons",
+    difficulty: "easy",
+    attribution: "Photo via Unsplash"
   }
 ];
 
@@ -567,6 +699,198 @@ export const EARTH_CLASSIC_CONTENT_BANK: MediaRound[] = [
       startLng: 174.7782,
       heading: 244,
       zoom: 16
+    }
+  },
+  {
+    id: "earth-classic-lisbon",
+    type: "street",
+    actualLat: 38.7139,
+    actualLng: -9.1394,
+    locationLabel: "Alfama, Lisbon",
+    contentPack: "HeliView",
+    difficulty: "medium",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 38.7118,
+      startLng: -9.1299,
+      heading: 284,
+      zoom: 16.2
+    }
+  },
+  {
+    id: "earth-classic-seoul",
+    type: "street",
+    actualLat: 37.5638,
+    actualLng: 126.982,
+    locationLabel: "Myeongdong, Seoul",
+    contentPack: "HeliView",
+    difficulty: "medium",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 37.5651,
+      startLng: 126.9844,
+      heading: 212,
+      zoom: 16.2
+    }
+  },
+  {
+    id: "earth-classic-taipei",
+    type: "street",
+    actualLat: 25.033,
+    actualLng: 121.5654,
+    locationLabel: "Xinyi, Taipei",
+    contentPack: "HeliView",
+    difficulty: "medium",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 25.0339,
+      startLng: 121.5645,
+      heading: 132,
+      zoom: 16.1
+    }
+  },
+  {
+    id: "earth-classic-amsterdam",
+    type: "street",
+    actualLat: 52.3676,
+    actualLng: 4.9041,
+    locationLabel: "Canal Ring, Amsterdam",
+    contentPack: "HeliView",
+    difficulty: "easy",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 52.3679,
+      startLng: 4.8897,
+      heading: 78,
+      zoom: 16.4
+    }
+  },
+  {
+    id: "earth-classic-edinburgh",
+    type: "street",
+    actualLat: 55.9486,
+    actualLng: -3.1999,
+    locationLabel: "Old Town, Edinburgh",
+    contentPack: "HeliView",
+    difficulty: "medium",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 55.9496,
+      startLng: -3.1904,
+      heading: 248,
+      zoom: 16.2
+    }
+  },
+  {
+    id: "earth-classic-dubrovnik",
+    type: "street",
+    actualLat: 42.6403,
+    actualLng: 18.1083,
+    locationLabel: "Old Town, Dubrovnik",
+    contentPack: "HeliView",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 42.641,
+      startLng: 18.1105,
+      heading: 308,
+      zoom: 16.3
+    }
+  },
+  {
+    id: "earth-classic-jaipur",
+    type: "street",
+    actualLat: 26.9239,
+    actualLng: 75.8267,
+    locationLabel: "Pink City, Jaipur",
+    contentPack: "HeliView",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 26.9258,
+      startLng: 75.8237,
+      heading: 96,
+      zoom: 16
+    }
+  },
+  {
+    id: "earth-classic-zanzibar",
+    type: "street",
+    actualLat: -6.1622,
+    actualLng: 39.1921,
+    locationLabel: "Stone Town, Zanzibar",
+    contentPack: "HeliView",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: -6.1616,
+      startLng: 39.1886,
+      heading: 68,
+      zoom: 15.9
+    }
+  },
+  {
+    id: "earth-classic-copenhagen",
+    type: "street",
+    actualLat: 55.6797,
+    actualLng: 12.5901,
+    locationLabel: "Nyhavn, Copenhagen",
+    contentPack: "HeliView",
+    difficulty: "easy",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 55.68,
+      startLng: 12.5887,
+      heading: 112,
+      zoom: 16.4
+    }
+  },
+  {
+    id: "earth-classic-lagos",
+    type: "street",
+    actualLat: 6.4281,
+    actualLng: 3.4219,
+    locationLabel: "Victoria Island, Lagos",
+    contentPack: "HeliView",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 6.4264,
+      startLng: 3.43,
+      heading: 276,
+      zoom: 15.8
+    }
+  },
+  {
+    id: "earth-classic-beirut",
+    type: "street",
+    actualLat: 33.8938,
+    actualLng: 35.5018,
+    locationLabel: "Downtown Beirut",
+    contentPack: "HeliView",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: 33.8954,
+      startLng: 35.5057,
+      heading: 190,
+      zoom: 16
+    }
+  },
+  {
+    id: "earth-classic-cusco",
+    type: "street",
+    actualLat: -13.5167,
+    actualLng: -71.9789,
+    locationLabel: "Historic Centre, Cusco",
+    contentPack: "HeliView",
+    difficulty: "hard",
+    attribution: "Street-map view via OpenFreeMap",
+    streetView: {
+      startLat: -13.5163,
+      startLng: -71.9781,
+      heading: 142,
+      zoom: 16.1
     }
   }
 ];
@@ -921,6 +1245,127 @@ const PIN_CENTRAL_SETS: Array<{
       { label: "Ho Chi Minh City", lat: 10.8231, lng: 106.6297, url: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=900&q=80" },
       { label: "Kuala Lumpur", lat: 3.139, lng: 101.6869, url: "https://images.unsplash.com/photo-1508964942454-1a56651d54ac?auto=format&fit=crop&w=900&q=80" },
       { label: "Singapore", lat: 1.3521, lng: 103.8198, url: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "baltic-harbour-chain",
+    label: "Baltic harbour chain",
+    difficulty: "medium",
+    clues: [
+      { label: "Tallinn", lat: 59.437, lng: 24.7536, url: "https://images.unsplash.com/photo-1565967511849-76a60a516170?auto=format&fit=crop&w=900&q=80" },
+      { label: "Riga", lat: 56.9496, lng: 24.1052, url: "https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?auto=format&fit=crop&w=900&q=80" },
+      { label: "Vilnius", lat: 54.6872, lng: 25.2797, url: "https://images.unsplash.com/photo-1587915860457-5a1dc7f822b5?auto=format&fit=crop&w=900&q=80" },
+      { label: "Gdansk", lat: 54.352, lng: 18.6466, url: "https://images.unsplash.com/photo-1550664730-9c13b3713022?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "arabian-peninsula",
+    label: "Arabian peninsula sweep",
+    difficulty: "medium",
+    clues: [
+      { label: "Riyadh", lat: 24.7136, lng: 46.6753, url: "https://images.unsplash.com/photo-1586724237569-f3d0c1dee8c6?auto=format&fit=crop&w=900&q=80" },
+      { label: "Doha", lat: 25.2854, lng: 51.531, url: "https://images.unsplash.com/photo-1527267207156-3372670819dc?auto=format&fit=crop&w=900&q=80" },
+      { label: "Muscat", lat: 23.588, lng: 58.3829, url: "https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=900&q=80" },
+      { label: "Kuwait City", lat: 29.3759, lng: 47.9774, url: "https://images.unsplash.com/photo-1526495124232-a04e1849168c?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "balkan-spine",
+    label: "Balkan spine",
+    difficulty: "hard",
+    clues: [
+      { label: "Zagreb", lat: 45.815, lng: 15.9819, url: "https://images.unsplash.com/photo-1555990538-c48f49d1df3d?auto=format&fit=crop&w=900&q=80" },
+      { label: "Sarajevo", lat: 43.8563, lng: 18.4131, url: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=900&q=80" },
+      { label: "Belgrade", lat: 44.8125, lng: 20.4612, url: "https://images.unsplash.com/photo-1541849546-216549ae216d?auto=format&fit=crop&w=900&q=80" },
+      { label: "Skopje", lat: 41.9981, lng: 21.4254, url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "caribbean-circuit",
+    label: "Caribbean circuit",
+    difficulty: "hard",
+    clues: [
+      { label: "Havana", lat: 23.1136, lng: -82.3666, url: "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=900&q=80" },
+      { label: "Kingston", lat: 17.9712, lng: -76.7936, url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80" },
+      { label: "Santo Domingo", lat: 18.4861, lng: -69.9312, url: "https://images.unsplash.com/photo-1518391846015-55a9cc003b25?auto=format&fit=crop&w=900&q=80" },
+      { label: "San Juan", lat: 18.4655, lng: -66.1057, url: "https://images.unsplash.com/photo-1544989164-31dc3c645987?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "west-africa-coast",
+    label: "West Africa coast",
+    difficulty: "hard",
+    clues: [
+      { label: "Dakar", lat: 14.7167, lng: -17.4677, url: "https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?auto=format&fit=crop&w=900&q=80" },
+      { label: "Accra", lat: 5.6037, lng: -0.187, url: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=900&q=80" },
+      { label: "Abidjan", lat: 5.36, lng: -4.0083, url: "https://images.unsplash.com/photo-1550850839-8dc894ed385a?auto=format&fit=crop&w=900&q=80" },
+      { label: "Lagos", lat: 6.5244, lng: 3.3792, url: "https://images.unsplash.com/photo-1528460033278-a6ba57020470?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "danube-capitals",
+    label: "Danube capitals",
+    difficulty: "easy",
+    clues: [
+      { label: "Vienna", lat: 48.2082, lng: 16.3738, url: "https://images.unsplash.com/photo-1516550893923-42d28e5677af?auto=format&fit=crop&w=900&q=80" },
+      { label: "Bratislava", lat: 48.1486, lng: 17.1077, url: "https://images.unsplash.com/photo-1529154036614-a60975f5c760?auto=format&fit=crop&w=900&q=80" },
+      { label: "Budapest", lat: 47.4979, lng: 19.0402, url: "https://images.unsplash.com/photo-1549877452-9c387954fbc2?auto=format&fit=crop&w=900&q=80" },
+      { label: "Belgrade", lat: 44.8125, lng: 20.4612, url: "https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "north-atlantic-isles",
+    label: "North Atlantic isles",
+    difficulty: "hard",
+    clues: [
+      { label: "Reykjavik", lat: 64.1466, lng: -21.9426, url: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?auto=format&fit=crop&w=900&q=80" },
+      { label: "Nuuk", lat: 64.1814, lng: -51.6941, url: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=900&q=80" },
+      { label: "Torshavn", lat: 62.0079, lng: -6.7909, url: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80" },
+      { label: "Dublin", lat: 53.3498, lng: -6.2603, url: "https://images.unsplash.com/photo-1549918864-48ac978761a4?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "himalaya-edge",
+    label: "Himalaya edge",
+    difficulty: "hard",
+    clues: [
+      { label: "Kathmandu", lat: 27.7172, lng: 85.324, url: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=900&q=80" },
+      { label: "Thimphu", lat: 27.4728, lng: 89.639, url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80" },
+      { label: "Leh", lat: 34.1526, lng: 77.5771, url: "https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=900&q=80" },
+      { label: "Islamabad", lat: 33.6844, lng: 73.0479, url: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "australian-east",
+    label: "Australian east coast",
+    difficulty: "easy",
+    clues: [
+      { label: "Brisbane", lat: -27.4698, lng: 153.0251, url: "https://images.unsplash.com/photo-1528072164453-f4e8ef0d475a?auto=format&fit=crop&w=900&q=80" },
+      { label: "Gold Coast", lat: -28.0167, lng: 153.4, url: "https://images.unsplash.com/photo-1516941064643-74aacd84843c?auto=format&fit=crop&w=900&q=80" },
+      { label: "Canberra", lat: -35.2809, lng: 149.13, url: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=900&q=80" },
+      { label: "Melbourne", lat: -37.8136, lng: 144.9631, url: "https://images.unsplash.com/photo-1514395462725-fb4566210144?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "north-africa-line",
+    label: "North Africa line",
+    difficulty: "medium",
+    clues: [
+      { label: "Rabat", lat: 34.0209, lng: -6.8416, url: "https://images.unsplash.com/photo-1548018560-c7196548e84d?auto=format&fit=crop&w=900&q=80" },
+      { label: "Algiers", lat: 36.7538, lng: 3.0588, url: "https://images.unsplash.com/photo-1548707309-dcebeab9ea9b?auto=format&fit=crop&w=900&q=80" },
+      { label: "Tunis", lat: 36.8065, lng: 10.1815, url: "https://images.unsplash.com/photo-1527838832700-5059252407fa?auto=format&fit=crop&w=900&q=80" },
+      { label: "Tripoli", lat: 32.8872, lng: 13.1913, url: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?auto=format&fit=crop&w=900&q=80" }
+    ]
+  },
+  {
+    id: "great-lakes-us",
+    label: "Great Lakes sweep",
+    difficulty: "easy",
+    clues: [
+      { label: "Chicago", lat: 41.8781, lng: -87.6298, url: "https://images.unsplash.com/photo-1494522855154-9297ac14b55f?auto=format&fit=crop&w=900&q=80" },
+      { label: "Detroit", lat: 42.3314, lng: -83.0458, url: "https://images.unsplash.com/photo-1543716091-a840c05249ec?auto=format&fit=crop&w=900&q=80" },
+      { label: "Cleveland", lat: 41.4993, lng: -81.6944, url: "https://images.unsplash.com/photo-1499092346589-b9b6be3e94b2?auto=format&fit=crop&w=900&q=80" },
+      { label: "Buffalo", lat: 42.8864, lng: -78.8784, url: "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=900&q=80" }
     ]
   }
 ];
