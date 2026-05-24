@@ -3,20 +3,39 @@ import maplibregl from "maplibre-gl";
 import { useEffect, useRef } from "react";
 import { Coordinates } from "../lib/geo";
 
+type MapPin = { id: string; label: string; color: string; position: Coordinates; hidden?: boolean };
+type MarkerConfig = {
+  id: string;
+  position: Coordinates;
+  label?: string;
+  color: string;
+  className: string;
+  draggable?: boolean;
+  onDragEnd?: (position: Coordinates) => void;
+};
+type MarkerRecord = {
+  marker: maplibregl.Marker;
+  signature: string;
+};
+
 type WorldGuessMapProps = {
   value?: Coordinates;
   actual?: Coordinates;
   disabled?: boolean;
   onChange?: (position: Coordinates) => void;
-  pins?: Array<{ id: string; label: string; color: string; position: Coordinates; hidden?: boolean }>;
+  pins?: MapPin[];
+  helperPins?: MapPin[];
+  helperCenter?: Coordinates;
 };
 
 const STREET_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
+const GUIDE_SOURCE_ID = "pinpoint-helper-guides";
+const GUIDE_LAYER_ID = "pinpoint-helper-guides-line";
 
-export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: WorldGuessMapProps) {
+export function WorldGuessMap({ value, actual, disabled, onChange, pins = [], helperPins = [], helperCenter }: WorldGuessMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
-  const markersRef = useRef<maplibregl.Marker[]>([]);
+  const markerRecordsRef = useRef<Map<string, MarkerRecord>>(new Map());
   const onChangeRef = useRef(onChange);
   const disabledRef = useRef(disabled);
   const hidePlaceLabels = Boolean(onChange);
@@ -75,8 +94,8 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
       resizeObserver?.disconnect();
       window.removeEventListener("resize", resizeMap);
       window.visualViewport?.removeEventListener("resize", resizeMap);
-      markersRef.current.forEach((marker) => marker.remove());
-      markersRef.current = [];
+      markerRecordsRef.current.forEach(({ marker }) => marker.remove());
+      markerRecordsRef.current.clear();
       map.remove();
       mapRef.current = null;
     };
@@ -85,37 +104,88 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    map.resize();
 
-    markersRef.current.forEach((marker) => marker.remove());
-    markersRef.current = [];
+    const guideFeatures = helperPins.length >= 2 && helperCenter
+      ? helperPins
+          .filter((pin) => !pin.hidden)
+          .map((pin) => ({
+            type: "Feature" as const,
+            properties: {},
+            geometry: {
+              type: "LineString" as const,
+              coordinates: [
+                [pin.position.lng, pin.position.lat],
+                [helperCenter.lng, helperCenter.lat]
+              ]
+            }
+          }))
+      : [];
+    const guideData = {
+      type: "FeatureCollection" as const,
+      features: guideFeatures
+    } satisfies GeoJSON.FeatureCollection;
+    const syncGuideLines = () => {
+      if (!map.isStyleLoaded()) return;
+      const existingSource = map.getSource(GUIDE_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
 
-    const addMarker = (
-      position: Coordinates,
-      options: { label?: string; color: string; className: string; draggable?: boolean; onDragEnd?: (position: Coordinates) => void }
-    ) => {
+      if (!guideFeatures.length) {
+        if (map.getLayer(GUIDE_LAYER_ID)) map.removeLayer(GUIDE_LAYER_ID);
+        if (existingSource) map.removeSource(GUIDE_SOURCE_ID);
+        return;
+      }
+
+      if (existingSource) {
+        existingSource.setData(guideData);
+        return;
+      }
+
+      map.addSource(GUIDE_SOURCE_ID, {
+        type: "geojson",
+        data: guideData
+      });
+      map.addLayer({
+        id: GUIDE_LAYER_ID,
+        type: "line",
+        source: GUIDE_SOURCE_ID,
+        paint: {
+          "line-color": "#ff6b57",
+          "line-width": 2,
+          "line-opacity": 0.62,
+          "line-dasharray": [1.2, 1.6]
+        }
+      });
+    };
+
+    syncGuideLines();
+    if (!map.isStyleLoaded()) map.once("load", syncGuideLines);
+
+    const createMarker = (config: MarkerConfig) => {
       const element = document.createElement("div");
-      element.className = `real-map-marker ${options.className}`;
-      element.style.setProperty("--marker-color", options.color);
-      element.innerHTML = `<span></span>${options.label ? `<strong>${options.label}</strong>` : ""}`;
+      element.className = `real-map-marker ${config.className}`;
+      element.style.setProperty("--marker-color", config.color);
+      element.innerHTML = `<span></span>${config.label ? `<strong>${config.label}</strong>` : ""}`;
 
-      const marker = new maplibregl.Marker({ element, draggable: options.draggable })
-        .setLngLat([position.lng, position.lat])
+      const marker = new maplibregl.Marker({ element, draggable: config.draggable })
+        .setLngLat([config.position.lng, config.position.lat])
         .addTo(map);
 
-      if (options.onDragEnd) {
+      if (config.onDragEnd) {
         marker.on("dragend", () => {
           const lngLat = marker.getLngLat();
-          options.onDragEnd?.({ lat: lngLat.lat, lng: lngLat.lng });
+          config.onDragEnd?.({ lat: lngLat.lat, lng: lngLat.lng });
         });
       }
 
-      markersRef.current.push(marker);
+      return marker;
     };
+
+    const markerConfigs: MarkerConfig[] = [];
 
     pins.forEach((pin) => {
       if (!pin.hidden) {
-        addMarker(pin.position, {
+        markerConfigs.push({
+          id: `pin:${pin.id}`,
+          position: pin.position,
           label: pin.label,
           color: pin.color,
           className: "labelled"
@@ -123,8 +193,32 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
       }
     });
 
+    helperPins.forEach((pin) => {
+      if (!pin.hidden) {
+        markerConfigs.push({
+          id: `helper:${pin.id}`,
+          position: pin.position,
+          label: pin.label,
+          color: pin.color,
+          className: "placeholder"
+        });
+      }
+    });
+
+    if (helperCenter && helperPins.filter((pin) => !pin.hidden).length >= 2) {
+      markerConfigs.push({
+        id: "helper:center",
+        position: helperCenter,
+        label: "Guide centre",
+        color: "#ff6b57",
+        className: "helper-center"
+      });
+    }
+
     if (actual) {
-      addMarker(actual, {
+      markerConfigs.push({
+        id: "actual",
+        position: actual,
         label: "Answer",
         color: "#ff6b57",
         className: "actual"
@@ -132,7 +226,9 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
     }
 
     if (value) {
-      addMarker(value, {
+      markerConfigs.push({
+        id: "own",
+        position: value,
         color: "#f6c85f",
         className: "own",
         draggable: !disabled,
@@ -140,28 +236,47 @@ export function WorldGuessMap({ value, actual, disabled, onChange, pins = [] }: 
       });
     }
 
+    const desiredMarkerIds = new Set(markerConfigs.map((config) => config.id));
+    markerRecordsRef.current.forEach(({ marker }, id) => {
+      if (!desiredMarkerIds.has(id)) {
+        marker.remove();
+        markerRecordsRef.current.delete(id);
+      }
+    });
+
+    markerConfigs.forEach((config) => {
+      const signature = `${config.className}|${config.color}|${config.label ?? ""}|${Boolean(config.draggable)}`;
+      const existing = markerRecordsRef.current.get(config.id);
+
+      if (existing?.signature === signature) {
+        existing.marker.setLngLat([config.position.lng, config.position.lat]);
+        return;
+      }
+
+      existing?.marker.remove();
+      markerRecordsRef.current.set(config.id, {
+        marker: createMarker(config),
+        signature
+      });
+    });
+
     const boundsPositions = [
       ...pins.filter((pin) => !pin.hidden).map((pin) => pin.position),
       ...(actual ? [actual] : []),
       ...(value ? [value] : [])
     ];
+    const shouldFitBounds = !onChange || disabled;
 
-    if (boundsPositions.length > 1) {
+    if (shouldFitBounds && boundsPositions.length > 1) {
       const bounds = new maplibregl.LngLatBounds();
       boundsPositions.forEach((position) => bounds.extend([position.lng, position.lat]));
       map.fitBounds(bounds, { padding: 80, maxZoom: 8, duration: disabled ? 900 : 0 });
     }
-  }, [actual, disabled, pins, value]);
+  }, [actual, disabled, helperCenter, helperPins, onChange, pins, value]);
 
   return (
     <div className="map-shell">
-      <div ref={containerRef} className={`world-map real-world-map ${disabled ? "is-locked" : ""}`}>
-        {!disabled && !value && (
-          <div className="map-empty">
-            <span>Tap the map or pinch to explore</span>
-          </div>
-        )}
-      </div>
+      <div ref={containerRef} className={`world-map real-world-map ${disabled ? "is-locked" : ""}`} />
 
       {onChange && (
         <button

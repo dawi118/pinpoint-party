@@ -30,14 +30,16 @@ export function EarthStreetView({ round }: { round: MediaRound }) {
       pitch: 67,
       bearing: seed.heading,
       attributionControl: false,
-      dragRotate: false,
-      pitchWithRotate: false
+      dragRotate: true,
+      pitchWithRotate: true,
+      touchPitch: true
     });
 
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-left");
+    map.addControl(new maplibregl.NavigationControl({ showCompass: true }), "top-left");
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
     map.touchZoomRotate.enable();
-    map.touchZoomRotate.disableRotation();
+    map.touchZoomRotate.enableRotation();
+    map.touchPitch.enable();
     map.scrollZoom.enable();
     map.doubleClickZoom.enable();
     map.boxZoom.enable();

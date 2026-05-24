@@ -713,6 +713,24 @@ select {
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
+.real-map-marker.placeholder > span {
+  width: 18px;
+  height: 18px;
+  border-width: 3px;
+  background: rgba(88, 213, 255, 0.88);
+}
+
+.real-map-marker.helper-center {
+  opacity: 0.78;
+}
+
+.real-map-marker.helper-center > span {
+  width: 24px;
+  height: 24px;
+  border-color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 107, 87, 0.68);
+}
+
 .real-map-marker strong {
   display: block;
   min-width: max-content;
@@ -828,15 +846,19 @@ select {
 
 .player-game {
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto auto minmax(0, 1fr);
   min-height: 100vh;
   min-height: 100svh;
-  overflow: auto;
+  overflow: hidden;
   overscroll-behavior: contain;
 }
 
 .earth-classic-player {
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+}
+
+.pin-central-player {
+  grid-template-rows: auto auto auto minmax(0, 1fr);
 }
 
 .classic-view-tabs {
@@ -873,11 +895,13 @@ select {
 .map-shell,
 .classic-play-surface {
   min-width: 0;
+  min-height: 0;
+  height: 100%;
 }
 
 .player-game .world-map {
-  height: calc(100svh - 170px);
-  min-height: 280px;
+  height: 100%;
+  min-height: 0;
   border-radius: 0;
   border-left: 0;
   border-right: 0;
@@ -886,8 +910,8 @@ select {
 .earth-classic-player .world-map,
 .earth-classic-player .earth-street-view,
 .earth-classic-player .earth-street-map {
-  height: calc(100svh - 218px);
-  min-height: 260px;
+  height: 100%;
+  min-height: 0;
   border-left: 0;
   border-right: 0;
   border-radius: 0;
@@ -900,20 +924,57 @@ select {
 }
 
 .confirm-dock {
-  position: sticky;
-  bottom: 0;
+  position: relative;
   z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.9rem 0.9rem calc(0.9rem + max(env(safe-area-inset-bottom), 12px));
+  padding: 0.75rem 0.9rem;
   background: rgba(7, 11, 19, 0.94);
-  box-shadow: 0 -18px 42px rgba(0, 0, 0, 0.28);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
 }
 
 .confirm-dock strong {
   display: block;
+}
+
+.central-pin-tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  background: rgba(12, 17, 29, 0.96);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pin-mode-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.pin-mode-toggle button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 42px;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #d7e0ec;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.pin-mode-toggle button.selected {
+  border-color: rgba(246, 200, 95, 0.82);
+  background: #f6c85f;
+  color: #16120a;
 }
 
 .result-metrics {
@@ -970,5 +1031,15 @@ select {
   .confirm-dock {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .central-pin-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .pin-mode-toggle button,
+  .central-pin-tools .secondary-action {
+    min-height: 40px;
+    font-size: 0.88rem;
   }
 }

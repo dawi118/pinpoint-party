@@ -1,4 +1,4 @@
-import { ArrowRight, Clock, Copy, Globe2, MapPinned, Play, RotateCcw, Route, Trophy, Users } from "lucide-react";
+import { ArrowRight, Clock, Copy, Crosshair, Globe2, MapPinned, Play, RotateCcw, Route, Trophy, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import {
@@ -427,13 +427,20 @@ function ModeMenu({ value, onChange }: { value: GameMode; onChange: (mode: GameM
         </span>
       </button>
       <button type="button" className={value === "pin_central" ? "selected" : ""} onClick={() => onChange("pin_central")}>
-        <Globe2 size={18} />
+        <Crosshair size={18} />
         <span>
           <strong>PinPoint Central</strong>
           <small>Four clues, find the centre</small>
         </span>
       </button>
-      <button type="button" className={isHeliViewMode(value) ? "selected" : ""} onClick={() => onChange("heliview")}>
+      <button type="button" className={value === "earth_classic" ? "selected" : ""} onClick={() => onChange("earth_classic")}>
+        <Globe2 size={18} />
+        <span>
+          <strong>PinPoint Classic</strong>
+          <small>Explore the map, closest wins</small>
+        </span>
+      </button>
+      <button type="button" className={value === "heliview" ? "selected" : ""} onClick={() => onChange("heliview")}>
         <Route size={18} />
         <span>
           <strong>HeliView</strong>
@@ -446,12 +453,14 @@ function ModeMenu({ value, onChange }: { value: GameMode; onChange: (mode: GameM
 
 function getModeLabel(mode: GameMode) {
   if (mode === "pin_central") return "PinPoint Central";
-  if (isHeliViewMode(mode)) return "HeliView";
+  if (mode === "earth_classic") return "PinPoint Classic";
+  if (mode === "heliview") return "HeliView";
   return "Pinpointer";
 }
 
 function getRoundPrompt(mode: GameMode) {
   if (mode === "pin_central") return "Where is the centre of these four places?";
+  if (mode === "earth_classic") return "Explore the map, then pinpoint it";
   if (isHeliViewMode(mode)) return "Explore the city map, then pinpoint it";
   return "Where was this taken?";
 }
@@ -469,7 +478,6 @@ function CentralPhotoGrid({ game }: { game: GameState }) {
       {images.map((image) => (
         <figure key={image.id}>
           <img src={image.url} alt={image.label} loading="eager" />
-          <figcaption>{image.label}</figcaption>
         </figure>
       ))}
     </div>
